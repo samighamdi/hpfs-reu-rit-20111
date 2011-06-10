@@ -1,11 +1,11 @@
-
+/*
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.util.concurrent.ForkJoinPool;
-
+*/
 public class ForkJoinClient {
-    private static final ForkJoinPool POOL = new ForkJoinPool();
+/*    private static final ForkJoinPool POOL = new ForkJoinPool();
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
 
@@ -15,5 +15,5 @@ public class ForkJoinClient {
 
     ForkJoinClient(InetAddress addr, int port) {
         so
-    }
+    }*/
 }

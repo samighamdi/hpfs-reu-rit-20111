@@ -9,8 +9,8 @@ import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.ForkJoinPool;	//jdk7
+import java.util.concurrent.RecursiveTask;	//jdk7
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
