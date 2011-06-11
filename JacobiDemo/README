@@ -1,0 +1,9 @@
+Built to Java >= 7
+
+COMPILE & RUN INSTRUCTIONS:
+
+cd src/
+javac *java
+java JacobiDemoFG
+
+There are javadocs so check those for more specific information.
