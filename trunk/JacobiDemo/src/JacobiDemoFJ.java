@@ -9,15 +9,17 @@ import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.concurrent.ForkJoinPool;	//jdk7
-import java.util.concurrent.RecursiveTask;	//jdk7
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
- *
- * ver scruffy.Thu Jun  9 00:25:04 EDT 2011
- * Forked from JacobiDemo:   ver. scruffy.Wed Jun  8 08:53:06 EDT 2011
+ * @author Ben Paretzky
+ * @version Wed Jun  8 08:53:06 EDT 2011
+ * Java 7 ForkJoin JacobiDemo
+ * Run with -help for usage
+ * Simplied Jacobi Relaxtion with Swing GUI.
  */
 public final class JacobiDemoFJ {
 
@@ -34,6 +36,9 @@ public final class JacobiDemoFJ {
         new JacobiDemoFJ(args).start();
     }
 
+    /**
+     * @param args Arguments passed from command line, check -help
+     */
     JacobiDemoFJ(String[] args) {
         parseArgs(args);
         prev = new int[width][height];
@@ -116,6 +121,13 @@ public final class JacobiDemoFJ {
         rootJob.reinitialize();
     }
 
+    /**
+     * Given a number and a max from a set, returns int [] BGR value from
+     * blue to red.  b/max == 1 for Red, and b == 0 for Blue
+     * @param b Value
+     * @param max Maximum
+     * @return BGR array. All values will sum to where 0 <= (b / max)  <= 1
+     */
     int[] makeBGR(int b, int max) {
         float percent = (max == 0) ? 0 : ((float) b) / max;
         int[] c = new int[3];
@@ -190,6 +202,9 @@ public final class JacobiDemoFJ {
         return cur;
     }
 
+    /**
+     * Prints help to stdout
+     */
     static void printHelp() {
         final String help =
                 "Jacobi Relaxation Demo by Ben Paretzky <ben@benparetzky.com> (6/7/11)\n"
