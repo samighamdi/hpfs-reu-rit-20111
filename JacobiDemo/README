@@ -1,5 +1,12 @@
 Built to Java >= 7
 
+Directory is a Netbeans Project
+Developed to/with:
+	NetBeans IDE 6.9 (Build 110209-unknown-revn)
+	Netbeans running via 1.6.0_22; OpenJDK 64-Bit Server VM 20.0-b11
+	System: Linux version 2.6.38.7-30.fc15.x86_64 running on amd64; UTF-8; en_US
+	Compile and run project with Java HotSpot(TM) 64-Bit Server VM (build 21.0-b14, mixed mode)
+
 COMPILE & RUN INSTRUCTIONS:
 
 cd src/
