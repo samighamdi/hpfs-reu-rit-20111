@@ -10,8 +10,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 /**
- *
- * ver.         scruffy.Wed Jun  8 08:53:06 EDT 2011
+ * @author Ben Paretzky
+ * @version Wed Jun  8 08:53:06 EDT 2011
+ * Serial JacobiDemo
+ * Run with -help for usage.
+ * Simplied Jacobi Relaxtion with Swing GUI.
  */
 public final class JacobiDemo {
 
@@ -25,6 +28,9 @@ public final class JacobiDemo {
         new JacobiDemo(args).start();
     }
 
+    /**
+     * @param args Arguments passed from command line, check -help
+     */
     JacobiDemo(String[] args) {
         parseArgs(args);
         data = new int[width][height];
@@ -133,6 +139,13 @@ public final class JacobiDemo {
         }
     }
 
+    /**
+     * Given a number and a max from a set, returns int [] BGR value from
+     * blue to red.  b/max == 1 for Red, and b == 0 for Blue
+     * @param b Value
+     * @param max Maximum
+     * @return BGR array. All values will sum to where 0 <= (b / max)  <= 1
+     */
     int[] makeBGR(int b, int max) {
         float percent = (max == 0) ? 0 : ((float) b) / max;
         int[] c = new int[3];
@@ -159,7 +172,7 @@ public final class JacobiDemo {
                     System.exit(1);
                 }
             }
-            if (s.startsWith("-h") && !s.equals("-help")) {
+            if (s.startsWith("-h") && !s.startsWith("-help")) {
                 s = s.substring(2);
                 try {
                     i = Integer.parseInt(s);
@@ -199,6 +212,9 @@ public final class JacobiDemo {
         }
     }
 
+    /**
+     * Prints help to stdout
+     */
     static void printHelp() {
         final String help =
                 "Jacobi Relaxation Demo by Ben Paretzky <ben@benparetzky.com> (6/7/11)\n"
