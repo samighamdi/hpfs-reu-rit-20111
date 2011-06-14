@@ -7,11 +7,9 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  *
@@ -25,6 +23,7 @@ public class JacobiClient extends Thread {
     private static final ForkJoinPool pool = new ForkJoinPool();
     private final InetAddress listenAddress;
     private final int listenPort, localId;
+    private final long id;
 
     public JacobiClient(InetAddress listenAddress, int port) {
         super();
@@ -32,6 +31,8 @@ public class JacobiClient extends Thread {
         this.listenPort = port;
         this.localId = CLIENT_COUNTER.getAndIncrement();
         this.setName("JacobiClient-" + this.localId);
+        id = ((System.currentTimeMillis() & 0xffffff) << 31) ^ System.currentTimeMillis();
+        // That ID will probably work for now, will we even need UUIDs?
     }
 
     public static void main(String[] args) {
@@ -83,6 +84,7 @@ public class JacobiClient extends Thread {
                         ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
                         RecursiveTask task = null;
                         Object o = null;
+                        long l = -1;
                         try {
                             s.setSoTimeout(3000);
                             /*
@@ -93,16 +95,19 @@ public class JacobiClient extends Thread {
                              */
                             o = in.readObject();
                             s.setSoTimeout(0);
+                            // Minimal EHLO, timeout, (x)or close connection
+                            if (!(o instanceof Long)) {
+                                break labelA;
+                            }
+                            l = (Long)o;
+                            if(l != JacobiServer.EHLO.longValue()) {
+                                break labelA;
+                            }
+                            out.writeLong(id);
+                            out.flush();
                         } catch (ClassNotFoundException ex) {
                             break labelA;
                         } catch (IOException ex) {
-                            break labelA;
-                        }
-                        // Minimal EHLO, timeout, or close connection
-                        if (!(o instanceof Long)) {
-                            break labelA;
-                        }
-                        if (((Long) o).longValue() != JacobiServer.EHLO.longValue()) {
                             break labelA;
                         }
                         for (;;) {
@@ -118,14 +123,14 @@ public class JacobiClient extends Thread {
                                 /*
                                  * Image processing goes here.  Task should get cast
                                  * to something where we have access to the internal
-                                 * maytricks.  No spoon, there is.
+                                 * maytricks.  No spoon, there is. - Yoda Fishburne
                                  */
                             } catch (IOException ex) {
-                                if(DEBUG) {
+                                if (DEBUG) {
                                     ex.printStackTrace();
                                 }
                                 break labelA;
-                            } catch(ClassNotFoundException ex) {
+                            } catch (ClassNotFoundException ex) {
                                 break labelA;
                             }
                         }

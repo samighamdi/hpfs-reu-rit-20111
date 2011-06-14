@@ -34,11 +34,13 @@ public class JacobiServer {
             InetAddress addr = InetAddress.getByName(addrParts[0]);
             int port = Integer.parseInt(addrParts[1]);
             Socket s = new Socket(addr, port);
-            s.setSoTimeout(0);
+            s.setSoTimeout(3000);
             ObjectOutputStream tempOut = new ObjectOutputStream(s.getOutputStream());
+            ObjectInputStream tempIn = new ObjectInputStream(s.getInputStream());
             tempOut.writeObject(EHLO);
             tempOut.flush();
-            clientMap.put(CLIENT_ID_GEN.getAndIncrement(), new MetaClient(s));
+            long l = tempIn.readLong();
+
             retVal = true;
         } catch (IOException ex) {
             if(DEBUG) {
@@ -49,7 +51,11 @@ public class JacobiServer {
     }
 
     private void printStatus() {
-        
+        StringBuilder sb = new StringBuilder();
+        sb.append("JacobiServer - Front-end Node\n");
+        sb.append("Currently connected to ");
+        sb.append(clientMap.size());
+        sb.append(" compute nodes.\n");
     }
 
     private boolean removeClient(String client) {
