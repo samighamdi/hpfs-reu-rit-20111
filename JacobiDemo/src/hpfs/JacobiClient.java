@@ -19,24 +19,18 @@ import java.util.concurrent.atomic.AtomicReference;
 public class JacobiClient extends Thread {
 
     private static final AtomicInteger CLIENT_COUNTER = new AtomicInteger(0);
-
-    private static enum MY_STATE {
-
-        WAITING, WORKING
-    };
     private static final boolean DEBUG = true;
+    private static final int TCP_BACKLOG = 16;
     private static final ForkJoinPool pool = new ForkJoinPool();
     private final InetAddress listenAddress;
-    private final int port, localId;
-    private final AtomicReference<MY_STATE> state;
+    private final int listenPort, localId;
 
     public JacobiClient(InetAddress listenAddress, int port) {
         super();
         this.listenAddress = listenAddress;
-        this.port = port;
+        this.listenPort = port;
         this.localId = CLIENT_COUNTER.getAndIncrement();
         this.setName("JacobiClient-" + this.localId);
-        state = new AtomicReference<>(MY_STATE.WAITING);
     }
 
     public static void main(String[] args) {
@@ -50,7 +44,7 @@ public class JacobiClient extends Thread {
         ServerSocket listenSocket = null;
         Socket s = null;
         try {
-            listenSocket = new ServerSocket(port, 2, listenAddress);
+            listenSocket = new ServerSocket(listenPort, TCP_BACKLOG, listenAddress);
             listenSocket.setSoTimeout(0);
         } catch (IOException ex) {
             if (DEBUG) {
@@ -72,15 +66,12 @@ public class JacobiClient extends Thread {
     }
 
     private void handleNewReq(final Socket s) {
-        if (!state.compareAndSet(MY_STATE.WAITING, MY_STATE.WORKING)) {
-            try {
-                s.close();
-            } catch (IOException ex) {
-                return;
-            }
-        }
         new Thread() {
-
+            /*
+             * There is some room for optimizations here, though it is worth
+             * noting that calling new Thread here probably won't be creating
+             * new os threads for each call.
+             */
             @Override
             public void run() {
                 try {
@@ -88,7 +79,7 @@ public class JacobiClient extends Thread {
                     {
                         ObjectInputStream in = new ObjectInputStream(s.getInputStream());
                         ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
-                        JacobiServer.JacobiMatrixTask task = null;
+                        RecursiveTask task = null;
                         Object o = null;
                         try {
                             o = in.readObject();
@@ -97,14 +88,18 @@ public class JacobiClient extends Thread {
                         } catch (IOException ex) {
                             break labelA;
                         }
-                        if (!(o instanceof JacobiServer.JacobiMatrixTask)) {
+                        if (!(o instanceof RecursiveTask)) {
                             break labelA;
                         }
-                        task = (JacobiServer.JacobiMatrixTask) o;
+                        task = (RecursiveTask) o;
                         o = pool.invoke(task);
                         out.writeObject(o);
-                        //task
                         out.flush();
+                        /*
+                         * Image processing goes here.  Task should get cast
+                         * to something where we have access to the internal
+                         * maytricks.  No spoon, there is.
+                         */
                     }
                 } catch (IOException ex) {
                     if (DEBUG) {
@@ -115,17 +110,16 @@ public class JacobiClient extends Thread {
                         s.close();
                     } catch (IOException ex) {
                     }
-                    state.set(MY_STATE.WAITING);
                 }
             }
         }.start();
     }
 
     public static final class ClientStatus implements Serializable {
+
         long jobsComplete;
         long clientRunningSince;
         boolean isWorking;
         String machineInfo;
     }
-
 }
