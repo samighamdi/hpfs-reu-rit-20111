@@ -3,6 +3,7 @@ package hpfs;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -119,4 +120,12 @@ public class JacobiClient extends Thread {
             }
         }.start();
     }
+
+    public static final class ClientStatus implements Serializable {
+        long jobsComplete;
+        long clientRunningSince;
+        boolean isWorking;
+        String machineInfo;
+    }
+
 }
