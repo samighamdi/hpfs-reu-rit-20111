@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class JacobiServer {
 
+    static final Long EHLO = 0xbeefFA1L;
     private static final boolean DEBUG = true;
     private final Map<Long, MetaClient> clientMap;
     private AtomicLong CLIENT_ID_GEN = new AtomicLong(1L);
@@ -34,6 +35,9 @@ public class JacobiServer {
             int port = Integer.parseInt(addrParts[1]);
             Socket s = new Socket(addr, port);
             s.setSoTimeout(0);
+            ObjectOutputStream tempOut = new ObjectOutputStream(s.getOutputStream());
+            tempOut.writeObject(EHLO);
+            tempOut.flush();
             clientMap.put(CLIENT_ID_GEN.getAndIncrement(), new MetaClient(s));
             retVal = true;
         } catch (IOException ex) {
