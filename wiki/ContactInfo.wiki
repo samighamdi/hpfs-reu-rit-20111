@@ -1,10 +1,6 @@
-#summary One-sentence summary of this page.
+#summary Some contact info, post some stuff for the world to know
 
 =Daniel Bokser=
-
-(516) 445-1766
-
-db693351@albany.edu
 
 =Kevin Broberg=
 
@@ -16,12 +12,4 @@ kevin.broberg@gmail.com
 
 =Daquanne Dwight=
 
-973-202-7772
-
-dld3754@rit.edu
-
 =Ben Paretzky=
-
-516.581.2802
-
-ben@benparetzky.com
