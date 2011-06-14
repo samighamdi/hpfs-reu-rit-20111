@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -72,6 +73,7 @@ public class JacobiClient extends Thread {
              * noting that calling new Thread here probably won't be creating
              * new os threads for each call.
              */
+
             @Override
             public void run() {
                 try {
@@ -82,24 +84,51 @@ public class JacobiClient extends Thread {
                         RecursiveTask task = null;
                         Object o = null;
                         try {
+                            s.setSoTimeout(3000);
+                            /*
+                             * The above line raises as SocketTimeoutException
+                             * if the read below times out.  That happens to be
+                             * an IOExpcetion thus getting caught and breaking
+                             * to labelA.
+                             */
                             o = in.readObject();
+                            s.setSoTimeout(0);
                         } catch (ClassNotFoundException ex) {
                             break labelA;
                         } catch (IOException ex) {
                             break labelA;
                         }
-                        if (!(o instanceof RecursiveTask)) {
+                        // Minimal EHLO, timeout, or close connection
+                        if (!(o instanceof Long)) {
                             break labelA;
                         }
-                        task = (RecursiveTask) o;
-                        o = pool.invoke(task);
-                        out.writeObject(o);
-                        out.flush();
-                        /*
-                         * Image processing goes here.  Task should get cast
-                         * to something where we have access to the internal
-                         * maytricks.  No spoon, there is.
-                         */
+                        if (((Long) o).longValue() != JacobiServer.EHLO.longValue()) {
+                            break labelA;
+                        }
+                        for (;;) {
+                            try {
+                                o = in.readObject();
+                                if (!(o instanceof RecursiveTask)) {
+                                    break labelA;
+                                }
+                                task = (RecursiveTask) o;
+                                o = pool.invoke(task);
+                                out.writeObject(o);
+                                out.flush();
+                                /*
+                                 * Image processing goes here.  Task should get cast
+                                 * to something where we have access to the internal
+                                 * maytricks.  No spoon, there is.
+                                 */
+                            } catch (IOException ex) {
+                                if(DEBUG) {
+                                    ex.printStackTrace();
+                                }
+                                break labelA;
+                            } catch(ClassNotFoundException ex) {
+                                break labelA;
+                            }
+                        }
                     }
                 } catch (IOException ex) {
                     if (DEBUG) {
