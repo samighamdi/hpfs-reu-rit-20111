@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'jacobiTests' target in the 'jacobiTests' project
+//
+
+#ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+#endif

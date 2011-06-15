@@ -1,0 +1,462 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		85A1F17913A8499600AC6F70 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A1F17813A8499600AC6F70 /* UIKit.framework */; };
+		85A1F17B13A8499700AC6F70 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A1F17A13A8499700AC6F70 /* Foundation.framework */; };
+		85A1F17D13A8499700AC6F70 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A1F17C13A8499700AC6F70 /* CoreGraphics.framework */; };
+		85A1F18313A8499700AC6F70 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 85A1F18113A8499700AC6F70 /* InfoPlist.strings */; };
+		85A1F18613A8499700AC6F70 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A1F18513A8499700AC6F70 /* main.m */; };
+		85A1F18913A8499700AC6F70 /* jacobiAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A1F18813A8499700AC6F70 /* jacobiAppDelegate.m */; };
+		85A1F18C13A8499700AC6F70 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 85A1F18A13A8499700AC6F70 /* MainWindow.xib */; };
+		85A1F18F13A8499700AC6F70 /* jacobiViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A1F18E13A8499700AC6F70 /* jacobiViewController.m */; };
+		85A1F19213A8499700AC6F70 /* jacobiViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 85A1F19013A8499700AC6F70 /* jacobiViewController.xib */; };
+		85A1F19913A8499700AC6F70 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A1F17813A8499600AC6F70 /* UIKit.framework */; };
+		85A1F19A13A8499700AC6F70 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A1F17A13A8499700AC6F70 /* Foundation.framework */; };
+		85A1F19B13A8499700AC6F70 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85A1F17C13A8499700AC6F70 /* CoreGraphics.framework */; };
+		85A1F1A313A8499700AC6F70 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 85A1F1A113A8499700AC6F70 /* InfoPlist.strings */; };
+		85A1F1A613A8499700AC6F70 /* jacobiTests.h in Resources */ = {isa = PBXBuildFile; fileRef = 85A1F1A513A8499700AC6F70 /* jacobiTests.h */; };
+		85A1F1A813A8499700AC6F70 /* jacobiTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A1F1A713A8499700AC6F70 /* jacobiTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		85A1F19C13A8499700AC6F70 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 85A1F16B13A8499600AC6F70 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 85A1F17313A8499600AC6F70;
+			remoteInfo = jacobi;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		85A1F17413A8499600AC6F70 /* jacobi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = jacobi.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		85A1F17813A8499600AC6F70 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		85A1F17A13A8499700AC6F70 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		85A1F17C13A8499700AC6F70 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		85A1F18013A8499700AC6F70 /* jacobi-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "jacobi-Info.plist"; sourceTree = "<group>"; };
+		85A1F18213A8499700AC6F70 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		85A1F18413A8499700AC6F70 /* jacobi-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "jacobi-Prefix.pch"; sourceTree = "<group>"; };
+		85A1F18513A8499700AC6F70 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		85A1F18713A8499700AC6F70 /* jacobiAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jacobiAppDelegate.h; sourceTree = "<group>"; };
+		85A1F18813A8499700AC6F70 /* jacobiAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = jacobiAppDelegate.m; sourceTree = "<group>"; };
+		85A1F18B13A8499700AC6F70 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		85A1F18D13A8499700AC6F70 /* jacobiViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jacobiViewController.h; sourceTree = "<group>"; };
+		85A1F18E13A8499700AC6F70 /* jacobiViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = jacobiViewController.m; sourceTree = "<group>"; };
+		85A1F19113A8499700AC6F70 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/jacobiViewController.xib; sourceTree = "<group>"; };
+		85A1F19813A8499700AC6F70 /* jacobiTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = jacobiTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		85A1F1A013A8499700AC6F70 /* jacobiTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "jacobiTests-Info.plist"; sourceTree = "<group>"; };
+		85A1F1A213A8499700AC6F70 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		85A1F1A413A8499700AC6F70 /* jacobiTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "jacobiTests-Prefix.pch"; sourceTree = "<group>"; };
+		85A1F1A513A8499700AC6F70 /* jacobiTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jacobiTests.h; sourceTree = "<group>"; };
+		85A1F1A713A8499700AC6F70 /* jacobiTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = jacobiTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		85A1F17113A8499600AC6F70 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85A1F17913A8499600AC6F70 /* UIKit.framework in Frameworks */,
+				85A1F17B13A8499700AC6F70 /* Foundation.framework in Frameworks */,
+				85A1F17D13A8499700AC6F70 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85A1F19413A8499700AC6F70 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85A1F19913A8499700AC6F70 /* UIKit.framework in Frameworks */,
+				85A1F19A13A8499700AC6F70 /* Foundation.framework in Frameworks */,
+				85A1F19B13A8499700AC6F70 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		85A1F16913A8499600AC6F70 = {
+			isa = PBXGroup;
+			children = (
+				85A1F17E13A8499700AC6F70 /* jacobi */,
+				85A1F19E13A8499700AC6F70 /* jacobiTests */,
+				85A1F17713A8499600AC6F70 /* Frameworks */,
+				85A1F17513A8499600AC6F70 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		85A1F17513A8499600AC6F70 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				85A1F17413A8499600AC6F70 /* jacobi.app */,
+				85A1F19813A8499700AC6F70 /* jacobiTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		85A1F17713A8499600AC6F70 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				85A1F17813A8499600AC6F70 /* UIKit.framework */,
+				85A1F17A13A8499700AC6F70 /* Foundation.framework */,
+				85A1F17C13A8499700AC6F70 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		85A1F17E13A8499700AC6F70 /* jacobi */ = {
+			isa = PBXGroup;
+			children = (
+				85A1F18713A8499700AC6F70 /* jacobiAppDelegate.h */,
+				85A1F18813A8499700AC6F70 /* jacobiAppDelegate.m */,
+				85A1F18A13A8499700AC6F70 /* MainWindow.xib */,
+				85A1F18D13A8499700AC6F70 /* jacobiViewController.h */,
+				85A1F18E13A8499700AC6F70 /* jacobiViewController.m */,
+				85A1F19013A8499700AC6F70 /* jacobiViewController.xib */,
+				85A1F17F13A8499700AC6F70 /* Supporting Files */,
+			);
+			path = jacobi;
+			sourceTree = "<group>";
+		};
+		85A1F17F13A8499700AC6F70 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				85A1F18013A8499700AC6F70 /* jacobi-Info.plist */,
+				85A1F18113A8499700AC6F70 /* InfoPlist.strings */,
+				85A1F18413A8499700AC6F70 /* jacobi-Prefix.pch */,
+				85A1F18513A8499700AC6F70 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		85A1F19E13A8499700AC6F70 /* jacobiTests */ = {
+			isa = PBXGroup;
+			children = (
+				85A1F1A513A8499700AC6F70 /* jacobiTests.h */,
+				85A1F1A713A8499700AC6F70 /* jacobiTests.m */,
+				85A1F19F13A8499700AC6F70 /* Supporting Files */,
+			);
+			path = jacobiTests;
+			sourceTree = "<group>";
+		};
+		85A1F19F13A8499700AC6F70 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				85A1F1A013A8499700AC6F70 /* jacobiTests-Info.plist */,
+				85A1F1A113A8499700AC6F70 /* InfoPlist.strings */,
+				85A1F1A413A8499700AC6F70 /* jacobiTests-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		85A1F17313A8499600AC6F70 /* jacobi */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85A1F1AB13A8499700AC6F70 /* Build configuration list for PBXNativeTarget "jacobi" */;
+			buildPhases = (
+				85A1F17013A8499600AC6F70 /* Sources */,
+				85A1F17113A8499600AC6F70 /* Frameworks */,
+				85A1F17213A8499600AC6F70 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = jacobi;
+			productName = jacobi;
+			productReference = 85A1F17413A8499600AC6F70 /* jacobi.app */;
+			productType = "com.apple.product-type.application";
+		};
+		85A1F19713A8499700AC6F70 /* jacobiTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 85A1F1AE13A8499700AC6F70 /* Build configuration list for PBXNativeTarget "jacobiTests" */;
+			buildPhases = (
+				85A1F19313A8499700AC6F70 /* Sources */,
+				85A1F19413A8499700AC6F70 /* Frameworks */,
+				85A1F19513A8499700AC6F70 /* Resources */,
+				85A1F19613A8499700AC6F70 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				85A1F19D13A8499700AC6F70 /* PBXTargetDependency */,
+			);
+			name = jacobiTests;
+			productName = jacobiTests;
+			productReference = 85A1F19813A8499700AC6F70 /* jacobiTests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		85A1F16B13A8499600AC6F70 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 85A1F16E13A8499600AC6F70 /* Build configuration list for PBXProject "jacobi" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 85A1F16913A8499600AC6F70;
+			productRefGroup = 85A1F17513A8499600AC6F70 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				85A1F17313A8499600AC6F70 /* jacobi */,
+				85A1F19713A8499700AC6F70 /* jacobiTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		85A1F17213A8499600AC6F70 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85A1F18313A8499700AC6F70 /* InfoPlist.strings in Resources */,
+				85A1F18C13A8499700AC6F70 /* MainWindow.xib in Resources */,
+				85A1F19213A8499700AC6F70 /* jacobiViewController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85A1F19513A8499700AC6F70 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85A1F1A313A8499700AC6F70 /* InfoPlist.strings in Resources */,
+				85A1F1A613A8499700AC6F70 /* jacobiTests.h in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		85A1F19613A8499700AC6F70 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		85A1F17013A8499600AC6F70 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85A1F18613A8499700AC6F70 /* main.m in Sources */,
+				85A1F18913A8499700AC6F70 /* jacobiAppDelegate.m in Sources */,
+				85A1F18F13A8499700AC6F70 /* jacobiViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		85A1F19313A8499700AC6F70 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				85A1F1A813A8499700AC6F70 /* jacobiTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		85A1F19D13A8499700AC6F70 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 85A1F17313A8499600AC6F70 /* jacobi */;
+			targetProxy = 85A1F19C13A8499700AC6F70 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		85A1F18113A8499700AC6F70 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				85A1F18213A8499700AC6F70 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		85A1F18A13A8499700AC6F70 /* MainWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				85A1F18B13A8499700AC6F70 /* en */,
+			);
+			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		85A1F19013A8499700AC6F70 /* jacobiViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				85A1F19113A8499700AC6F70 /* en */,
+			);
+			name = jacobiViewController.xib;
+			sourceTree = "<group>";
+		};
+		85A1F1A113A8499700AC6F70 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				85A1F1A213A8499700AC6F70 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		85A1F1A913A8499700AC6F70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+		85A1F1AA13A8499700AC6F70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Release;
+		};
+		85A1F1AC13A8499700AC6F70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "jacobi/jacobi-Prefix.pch";
+				INFOPLIST_FILE = "jacobi/jacobi-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		85A1F1AD13A8499700AC6F70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "jacobi/jacobi-Prefix.pch";
+				INFOPLIST_FILE = "jacobi/jacobi-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		85A1F1AF13A8499700AC6F70 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/jacobi.app/jacobi";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "jacobiTests/jacobiTests-Prefix.pch";
+				INFOPLIST_FILE = "jacobiTests/jacobiTests-Info.plist";
+				OTHER_LDFLAGS = (
+					"-framework",
+					SenTestingKit,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		85A1F1B013A8499700AC6F70 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/jacobi.app/jacobi";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "jacobiTests/jacobiTests-Prefix.pch";
+				INFOPLIST_FILE = "jacobiTests/jacobiTests-Info.plist";
+				OTHER_LDFLAGS = (
+					"-framework",
+					SenTestingKit,
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		85A1F16E13A8499600AC6F70 /* Build configuration list for PBXProject "jacobi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85A1F1A913A8499700AC6F70 /* Debug */,
+				85A1F1AA13A8499700AC6F70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		85A1F1AB13A8499700AC6F70 /* Build configuration list for PBXNativeTarget "jacobi" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85A1F1AC13A8499700AC6F70 /* Debug */,
+				85A1F1AD13A8499700AC6F70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		85A1F1AE13A8499700AC6F70 /* Build configuration list for PBXNativeTarget "jacobiTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				85A1F1AF13A8499700AC6F70 /* Debug */,
+				85A1F1B013A8499700AC6F70 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 85A1F16B13A8499600AC6F70 /* Project object */;
+}
