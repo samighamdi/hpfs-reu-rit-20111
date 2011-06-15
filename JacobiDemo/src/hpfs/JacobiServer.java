@@ -11,6 +11,10 @@ import java.util.Scanner;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ *
+ * @author Ben Paretzky
+ */
 public class JacobiServer {
 
     static final Long EHLO = 0xbeefFA1L;
