@@ -6,10 +6,11 @@ import java.io.ObjectOutputStream;
 import java.lang.NumberFormatException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
@@ -20,31 +21,38 @@ public class JacobiServer {
     static final Long EHLO = 0xbeefFA1L;
     private static final boolean DEBUG = true;
     private final Map<Long, MetaClient> clientMap;
-    private AtomicLong CLIENT_ID_GEN = new AtomicLong(1L);
+    private final Selector selector; //All channels attach their clientId
 
     public static void main(String [] args) {
-        JacobiServer js = new JacobiServer();
+        JacobiServer js = null;
+        try {
+            js = new JacobiServer();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return;
+        }
         js.forkREPL();
     }
 
-    public JacobiServer() {
+    public JacobiServer() throws IOException {
         clientMap = new ConcurrentSkipListMap<>();
+        selector = Selector.open();
     }
 
     private boolean addClient(String address) {
         String [] addrParts = address.split(":",2);
+        MetaClient client = null;
+        long clientId = Long.MIN_VALUE;
         boolean retVal = false;
         try {
             InetAddress addr = InetAddress.getByName(addrParts[0]);
             int port = Integer.parseInt(addrParts[1]);
             Socket s = new Socket(addr, port);
-            s.setSoTimeout(3000);
-            ObjectOutputStream tempOut = new ObjectOutputStream(s.getOutputStream());
-            ObjectInputStream tempIn = new ObjectInputStream(s.getInputStream());
-            tempOut.writeObject(EHLO);
-            tempOut.flush();
-            long l = tempIn.readLong();
-
+            client = new MetaClient(s);
+            clientId = client.in.readLong();
+            clientMap.put(clientId, client);
+            s.getChannel().configureBlocking(false);
+            s.getChannel().register(selector, SelectionKey.OP_READ, clientId);
             retVal = true;
         } catch (IOException ex) {
             if(DEBUG) {
