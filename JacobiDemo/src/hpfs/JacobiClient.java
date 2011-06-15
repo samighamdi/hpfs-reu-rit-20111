@@ -95,6 +95,9 @@ public class JacobiClient extends Thread {
             } catch (IOException ex) {
                 continue;
             } finally {
+                // Make some change so this code is reachable without an exception
+                // being thrown.  We need something in order to know when
+                // the clients should shut off.  Or do we?
                 for (SelectionKey sk : selector.keys()) {
                     try {
                         if (sk.attachment() instanceof Closeable) {
