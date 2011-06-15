@@ -89,7 +89,7 @@ public class JacobiClient extends Thread {
                         if (!(o instanceof JacobiMessage)) {
                             continue;
                         }
-                        pool.execute(new MessageAction((JacobiMessage)o));
+                        pool.execute(new MessageAction((JacobiMessage)o, ));
                     }
                 }
             } catch (IOException ex) {
@@ -114,9 +114,11 @@ public class JacobiClient extends Thread {
     private static class MessageAction extends RecursiveAction {
 
         final JacobiMessage msg;
+        final Socket s;
 
-        MessageAction(JacobiMessage msg) {
+        MessageAction(JacobiMessage msg, Socket s) {
             this.msg = msg;
+            this.s = s;
         }
 
         @Override
@@ -124,7 +126,20 @@ public class JacobiClient extends Thread {
             if(msg == null) {
                 return;
             }
-            // Kevin: your switch 'nshit goes here. -Ben
+            
+            switch( msg.msgType ) {
+                case TASK:
+                    TaskMessage t = (TaskMessage)msg;
+                    t.getTask().invoke();
+                    break;
+                case RESULT:
+                    
+                    break;
+                case QUERY:
+                    break;
+                case ANSWER:
+                    return;
+            }
         }
         
     }
