@@ -11,7 +11,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveTask;
+import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -89,7 +89,7 @@ public class JacobiClient extends Thread {
                         if (!(o instanceof JacobiMessage)) {
                             continue;
                         }
-                        handleMessage((JacobiMessage) o);
+                        pool.execute(new MessageAction((JacobiMessage)o));
                     }
                 }
             } catch (IOException ex) {
@@ -111,20 +111,21 @@ public class JacobiClient extends Thread {
         }
     }
 
-    private static JacobiMessage handleMessage(JacobiMessage message) {
-        switch( message.msgType ) {
-            case TASK:
-                RecursiveTask ra = ((TaskMessage) message).getTask();
-                // add ra to forkjoinpool
-                break;
-            case QUERY:
-                // reply to the query; don't i need the sockets
-                // in caller's scope?
-                break;
-            case RESULT:
-            case ANSWER:
-                // somehow indicate an erroneous message arrived at this node?
-                break;
+    private static class MessageAction extends RecursiveAction {
+
+        final JacobiMessage msg;
+
+        MessageAction(JacobiMessage msg) {
+            this.msg = msg;
         }
+
+        @Override
+        protected void compute() {
+            if(msg == null) {
+                return;
+            }
+        }
+        
     }
+
 }
