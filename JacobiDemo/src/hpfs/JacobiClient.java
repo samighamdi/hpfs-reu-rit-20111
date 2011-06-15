@@ -1,5 +1,6 @@
 package hpfs;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -52,6 +53,7 @@ public class JacobiClient extends Thread {
         ObjectInputStream socketIn = null;
         ObjectOutputStream socketOut = null;
         Object o = null;
+        Closeable c = null;
         try {
             serverSocket = new ServerSocket(listenPort, TCP_BACKLOG, listenAddress);
             serverSocket.getChannel().configureBlocking(false);
@@ -76,7 +78,7 @@ public class JacobiClient extends Thread {
                         socket.getChannel().configureBlocking(false);
                         socket.getChannel().register(selector, SelectionKey.OP_READ, socket);
                     }
-                    if((sk.attachment() instanceof Socket) && sk.isReadable()) {
+                    if ((sk.attachment() instanceof Socket) && sk.isReadable()) {
                         socket = (Socket) sk.attachment();
                         socketIn = new ObjectInputStream(socket.getInputStream());
                         try {
@@ -84,14 +86,24 @@ public class JacobiClient extends Thread {
                         } catch (ClassNotFoundException ex) {
                             continue;
                         }
-                        if(!(o instanceof JacobiMessage)) {
+                        if (!(o instanceof JacobiMessage)) {
                             continue;
                         }
-                        handleMessage((JacobiMessage)o);
+                        handleMessage((JacobiMessage) o);
                     }
                 }
             } catch (IOException ex) {
                 continue;
+            } finally {
+                for (SelectionKey sk : selector.keys()) {
+                    try {
+                        if (sk.attachment() instanceof Closeable) {
+                            c = (Closeable) sk.attachment();
+                            c.close();
+                        }
+                    } catch (IOException ex) {
+                    }
+                }
             }
         }
     }
@@ -99,6 +111,4 @@ public class JacobiClient extends Thread {
     private static void handleMessage(JacobiMessage message) {
         // TO DO
     }
-
-
 }
