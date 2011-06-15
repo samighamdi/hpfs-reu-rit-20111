@@ -33,7 +33,7 @@ public class JacobiClient extends Thread {
         this.listenPort = port;
         this.localId = CLIENT_COUNTER.getAndIncrement();
         this.setName("JacobiClient-" + this.localId);
-        id = ((System.currentTimeMillis() & 0xffffff) << 31) ^ System.currentTimeMillis();
+        id = ((System.currentTimeMillis() & 0xffffff) << 31) | System.currentTimeMillis();
         // That ID will probably work for now, will we even need UUIDs?
     }
 
