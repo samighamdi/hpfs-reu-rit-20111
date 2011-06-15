@@ -70,8 +70,17 @@ public class JacobiServer {
         sb.append(" compute nodes.\n");
     }
 
-    private boolean removeClient(String client) {
-        return false;
+    private boolean removeClient(long clientId) {
+        MetaClient client = clientMap.remove(clientId);
+        if(client == null) {
+            return false;
+        }
+        try {
+            client.socket.close();
+        } catch(IOException ex) {
+            
+        }
+        return true;
     }
 
     public void printREPLHelp() {
@@ -84,6 +93,7 @@ public class JacobiServer {
             public void run() {
                 Scanner stdIn = new Scanner(System.in);
                 String s = null;
+                long l = 0;
                 System.out.println("Starting JacobiServer Admin Console");
                 do {
                     System.out.print("> ");
@@ -104,9 +114,9 @@ public class JacobiServer {
                             break;
                         case "r":
                         case "remove":
-                            s = stdIn.next();
-                            if(removeClient(s)) {
-                                System.out.println("Successfully removed " + s);
+                            l = stdIn.nextLong();
+                            if(removeClient(l)) {
+                                System.out.println("Successfully removed client: " + l);
                             } else {
                                 System.out.println("Unable to remove client");
                             }
