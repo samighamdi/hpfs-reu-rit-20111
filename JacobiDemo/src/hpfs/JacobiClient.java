@@ -47,9 +47,10 @@ public class JacobiClient extends Thread {
     public void run() {
         ServerSocket serverSocket = null;
         Socket socket = null;
-        Selector selector = null;
+        Selector selector = null; // channels attach their Socket or ServerSocket
         Set<SelectionKey> selectSet = null;
         ObjectInputStream socketIn = null;
+        ObjectOutputStream socketOut = null;
         Object o = null;
         try {
             serverSocket = new ServerSocket(listenPort, TCP_BACKLOG, listenAddress);
@@ -69,6 +70,9 @@ public class JacobiClient extends Thread {
                     if ((sk.attachment() instanceof ServerSocket) && sk.isAcceptable()) {
                         serverSocket = (ServerSocket) sk.attachment();
                         socket = serverSocket.accept();
+                        socketOut = new ObjectOutputStream(socket.getOutputStream());
+                        socketOut.writeLong(id);
+                        socketOut.flush();
                         socket.getChannel().configureBlocking(false);
                         socket.getChannel().register(selector, SelectionKey.OP_READ, socket);
                     }
