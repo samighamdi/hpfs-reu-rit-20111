@@ -111,7 +111,20 @@ public class JacobiClient extends Thread {
         }
     }
 
-    private static void handleMessage(JacobiMessage message) {
-        // TO DO
+    private static JacobiMessage handleMessage(JacobiMessage message) {
+        switch( message.msgType ) {
+            case TASK:
+                RecursiveTask ra = ((TaskMessage) message).getTask();
+                // add ra to forkjoinpool
+                break;
+            case QUERY:
+                // reply to the query; don't i need the sockets
+                // in caller's scope?
+                break;
+            case RESULT:
+            case ANSWER:
+                // somehow indicate an erroneous message arrived at this node?
+                break;
+        }
     }
 }
