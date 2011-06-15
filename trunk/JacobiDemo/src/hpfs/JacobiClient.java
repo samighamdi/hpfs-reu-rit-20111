@@ -3,10 +3,12 @@ package hpfs;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,117 +45,56 @@ public class JacobiClient extends Thread {
 
     @Override
     public void run() {
-        ServerSocket listenSocket = null;
-        Socket s = null;
+        ServerSocket serverSocket = null;
+        Socket socket = null;
+        Selector selector = null;
+        Set<SelectionKey> selectSet = null;
+        ObjectInputStream socketIn = null;
+        Object o = null;
         try {
-            listenSocket = new ServerSocket(listenPort, TCP_BACKLOG, listenAddress);
-            listenSocket.setSoTimeout(0);
+            serverSocket = new ServerSocket(listenPort, TCP_BACKLOG, listenAddress);
+            serverSocket.getChannel().configureBlocking(false);
+            serverSocket.getChannel().register(selector, SelectionKey.OP_ACCEPT, serverSocket);
         } catch (IOException ex) {
-            if (DEBUG) {
-                ex.printStackTrace();
-            }
-        }
-        if (listenSocket == null) {
+            ex.printStackTrace();
             return;
         }
         for (;;) {
             try {
-                s = listenSocket.accept();
-                handleNewReq(s);
-            } catch (IOException ex) {
-                break;
-            }
-        }
-
-    }
-
-    private void handleNewReq(final Socket s) {
-        new Thread() {
-            /*
-             * There is some room for optimizations here, though it is worth
-             * noting that calling new Thread here probably won't be creating
-             * new os threads for each call.
-             */
-
-            @Override
-            public void run() {
-                try {
-                    labelA:
-                    {
-                        ObjectInputStream in = new ObjectInputStream(s.getInputStream());
-                        ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
-                        RecursiveTask task = null;
-                        Object o = null;
-                        long l = -1;
+                if (selector.select() < 1) {
+                    continue;
+                }
+                selectSet = selector.selectedKeys();
+                for (SelectionKey sk : selectSet) {
+                    if ((sk.attachment() instanceof ServerSocket) && sk.isAcceptable()) {
+                        serverSocket = (ServerSocket) sk.attachment();
+                        socket = serverSocket.accept();
+                        socket.getChannel().configureBlocking(false);
+                        socket.getChannel().register(selector, SelectionKey.OP_READ, socket);
+                    }
+                    if((sk.attachment() instanceof Socket) && sk.isReadable()) {
+                        socket = (Socket) sk.attachment();
+                        socketIn = new ObjectInputStream(socket.getInputStream());
                         try {
-                            s.setSoTimeout(3000);
-                            /*
-                             * The above line raises as SocketTimeoutException
-                             * if the read below times out.  That happens to be
-                             * an IOExpcetion thus getting caught and breaking
-                             * to labelA.
-                             */
-                            o = in.readObject();
-                            s.setSoTimeout(0);
-                            // Minimal EHLO, timeout, (x)or close connection
-                            if (!(o instanceof Long)) {
-                                break labelA;
-                            }
-                            l = (Long)o;
-                            if(l != JacobiServer.EHLO.longValue()) {
-                                break labelA;
-                            }
-                            out.writeLong(id);
-                            out.flush();
+                            o = socketIn.readObject();
                         } catch (ClassNotFoundException ex) {
-                            break labelA;
-                        } catch (IOException ex) {
-                            break labelA;
+                            continue;
                         }
-                        for (;;) {
-                            try {
-                                o = in.readObject();
-                                if (!(o instanceof RecursiveTask)) {
-                                    break labelA;
-                                }
-                                task = (RecursiveTask) o;
-                                o = pool.invoke(task);
-                                out.writeObject(o);
-                                out.flush();
-                                /*
-                                 * Image processing goes here.  Task should get cast
-                                 * to something where we have access to the internal
-                                 * maytricks.  No spoon, there is. - Yoda Fishburne
-                                 */
-                            } catch (IOException ex) {
-                                if (DEBUG) {
-                                    ex.printStackTrace();
-                                }
-                                break labelA;
-                            } catch (ClassNotFoundException ex) {
-                                break labelA;
-                            }
+                        if(!(o instanceof JacobiMessage)) {
+                            continue;
                         }
-                    }
-                } catch (IOException ex) {
-                    if (DEBUG) {
-                        ex.printStackTrace();
-                    }
-                } finally {
-                    try {
-                        s.close();
-                    } catch (IOException ex) {
+                        handleMessage((JacobiMessage)o);
                     }
                 }
+            } catch (IOException ex) {
+                continue;
             }
-        }.start();
+        }
     }
 
-    public static final class ClientStatus implements Serializable {
-
-        long jobsComplete;
-        long clientRunningSince;
-        boolean isWorking;
-        String machineInfo;
+    private static void handleMessage(JacobiMessage message) {
+        // TO DO
     }
+
+
 }
