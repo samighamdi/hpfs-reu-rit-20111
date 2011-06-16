@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface jacobiViewController : UIViewController {
-    @private
+   
     
     IBOutlet UIImageView *imgV;
 }
@@ -17,7 +17,6 @@
 
 @property (retain, nonatomic) IBOutlet UIImageView *imgV;
 
--(UIImage *) getImageWithUrl: (NSString *) str;
 -(void) tapGesture: (UITapGestureRecognizer*) tgr;
 -(void) sendURLRequest: (CGPoint) point;
 -(void) drawImage;

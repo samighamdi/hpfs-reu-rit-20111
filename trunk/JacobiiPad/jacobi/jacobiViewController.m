@@ -29,11 +29,6 @@
     
 }
  
--(UIImage *) getImageWithUrl: (NSString *) str
-{
-    NSData *img = [[[NSData alloc] initWithContentsOfURL:[NSURL URLWithString: str]] autorelease];
-    return [UIImage imageWithData: img];
-}
 
 - (void) sendURLRequest:(CGPoint)point
 {
@@ -63,14 +58,17 @@
     }
     else
         str = @"http://www.webdesign.org/img_articles/7072/BW-kitten.jpg";
-    UIImage *img = [self getImageWithUrl:str];
+     
+    
+    UIImage *img = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:str]]];
+    //UIImage *img = [self getImageWithUrl:str];
     //UIScrollView *scrollView;
     //create an image view
     
     
     
     if (img) {
-        imgV.image = img;
+        [imgV setImage:img];
     }
     
     
