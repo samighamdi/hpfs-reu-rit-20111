@@ -1,6 +1,8 @@
 package hpfs;
 
+import java.io.Serializable;
 import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.RecursiveTask;
 
 /**
  *
@@ -8,12 +10,12 @@ import java.util.concurrent.RecursiveAction;
  */
 public class TaskMessage extends JacobiMessage {
 
-    public TaskMessage(RecursiveAction task, long clientId) {
+    public TaskMessage(RecursiveTask<Serializable> task, long clientId) {
         super(MSG_TYPE.TASK, clientId, task);
     }
 
-    public RecursiveAction getTask() {
-        return (RecursiveAction) data;
+    public RecursiveTask<Serializable> getTask() {
+        return (RecursiveTask<Serializable>) data;
     }
 
 }
