@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -89,7 +90,7 @@ public class JacobiClient extends Thread {
                         if (!(o instanceof JacobiMessage)) {
                             continue;
                         }
-                        pool.execute(new MessageAction((JacobiMessage)o, ));
+                        pool.execute(new MessageAction((JacobiMessage)o, socketOut));
                     }
                 }
             } catch (IOException ex) {
@@ -114,11 +115,11 @@ public class JacobiClient extends Thread {
     private static class MessageAction extends RecursiveAction {
 
         final JacobiMessage msg;
-        final Socket s;
+        final ObjectOutputStream out;
 
-        MessageAction(JacobiMessage msg, Socket s) {
+        MessageAction(JacobiMessage msg, ObjectOutputStream out) {
             this.msg = msg;
-            this.s = s;
+            this.out = out;
         }
 
         @Override
@@ -130,18 +131,19 @@ public class JacobiClient extends Thread {
             switch( msg.msgType ) {
                 case TASK:
                     TaskMessage t = (TaskMessage)msg;
-                    t.getTask().invoke();
+                    try {
+                        out.writeObject(t.getTask().invoke());
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                     break;
+                // clients only receive tasks    
                 case RESULT:
-                    
-                    break;
+                // monitor communication not yet implemented
+                case ANSWER:
                 case QUERY:
                     break;
-                case ANSWER:
-                    return;
             }
-        }
-        
+        }    
     }
-
 }
