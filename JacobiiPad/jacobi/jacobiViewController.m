@@ -8,17 +8,15 @@
 
 #import "jacobiViewController.h"
 
-@interface jacobiViewController()
-@property int i;
-@end
 
 
 @implementation jacobiViewController
 
-@synthesize i;
+@synthesize imgV;
+
 - (void)dealloc
 {
-    
+    [imgV release];
     [super dealloc];
 }
 
@@ -50,6 +48,8 @@
     if(!connect)
         NSLog(@"Connection failed");
     
+    
+    
     [connect release];
 }
 
@@ -63,32 +63,32 @@
     }
     else
         str = @"http://www.webdesign.org/img_articles/7072/BW-kitten.jpg";
-    UIImageView *imgV;
-    UIScrollView *scrollView;
+    UIImage *img = [self getImageWithUrl:str];
+    //UIScrollView *scrollView;
     //create an image view
-    imgV = [[UIImageView alloc] initWithImage: [self getImageWithUrl:str]];
-    //set a unique tag of the image view so it can be removed
-    imgV.tag = i;
+    
+    
+    
+    if (img) {
+        imgV.image = img;
+    }
+    
+    
+    [img release];
+    
+    /*
     scrollView = (UIScrollView *)[self.view viewWithTag:100];
     scrollView.contentSize = imgV.image.size;
     [scrollView addSubview:imgV];
-    NSLog(@"%d", [scrollView.subviews count]);
+     */
    
     
-    
-    [self performSelector:@selector(removeImageWithTag:) withObject:[NSNumber numberWithInt:i] afterDelay:0.1];
-    [imgV release];
-    i++;
+   
             
         
     
 }
 
-- (void) removeImageWithTag: (NSNumber *) n
-{
-    UIView *subview = [[self.view viewWithTag:100] viewWithTag:[n integerValue]];
-    [subview removeFromSuperview];
-}
 
 
 
@@ -108,7 +108,7 @@
 {
     [super viewDidLoad];
     
-    i = 0;
+   
     
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGesture:)];
     
@@ -120,18 +120,20 @@
     [tapGesture release];
     
     
-    
+    /*
     UIScrollView *imageScrollView = [[UIScrollView alloc] initWithFrame:[[self view] bounds]];
     imageScrollView.tag = 100;
     [imageScrollView setBackgroundColor:[UIColor blackColor]];
     [imageScrollView setDelegate:self];
     [imageScrollView setBouncesZoom:YES];
     [[self view] addSubview:imageScrollView];
+     
     
     //add image view to view
     
     
     [imageScrollView release];
+     */
     
     [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(drawImage) userInfo:nil repeats:YES];
     
@@ -142,7 +144,8 @@
 - (void)viewDidUnload
 {
     
-    
+    [imgV release];
+    imgV = nil;
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;

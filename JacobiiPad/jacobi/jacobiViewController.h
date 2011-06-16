@@ -8,20 +8,20 @@
 
 #import <UIKit/UIKit.h>
 
-@interface jacobiViewController : UIViewController <UIScrollViewDelegate> {
+@interface jacobiViewController : UIViewController {
     @private
-    int i;
     
+    IBOutlet UIImageView *imgV;
 }
 
 
-
+@property (retain, nonatomic) IBOutlet UIImageView *imgV;
 
 -(UIImage *) getImageWithUrl: (NSString *) str;
 -(void) tapGesture: (UITapGestureRecognizer*) tgr;
 -(void) sendURLRequest: (CGPoint) point;
 -(void) drawImage;
--(void) removeImageWithTag: (NSNumber *) n;
+
 
 
 @end
