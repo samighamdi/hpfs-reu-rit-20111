@@ -3,7 +3,6 @@ package hpfs;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
 
 /**
@@ -25,13 +24,14 @@ public class TaskMessage extends JacobiMessage {
 class LeafNode extends Node {
 
     int max = Integer.MIN_VALUE;
-
-    LeafNode(int left, int top, int right, int bottom, int height, int width) {
-        super(left, top, right, bottom, height, width);
+    LeafNode(int[][] start, int left, int top, int right, int bottom, int height, int width) {
+        super(start, left, top, right, bottom, height, width);
+        
     }
 
-    int stepPoint(int[][] from, int[][] to, int w, int h) {
+    int stepPoint(int w, int h) {
         int l, r, u, d, nCount; // left, right, up, down
+        int[][] from = start;
         if (w != 0) {
             l = 1;
         } else {
@@ -68,18 +68,17 @@ class LeafNode extends Node {
         }
         runVal += from[w][h];
         nCount++;
-        to[w][h] = (int) (runVal / nCount);
-        return to[w][h];
+        //to[w][h] = (int) (runVal / nCount);
+        return (int) (runVal / nCount);
     }
 
     @Override
     protected Integer compute() {
-        int[][] prev = demo.getPreviousData();
-        int[][] cur = demo.getCurrentData();
         int retVal = Integer.MIN_VALUE, i;
         for (int c = left; c < right; c++) {
             for (int r = top; r < bottom; r++) {
-                i = stepPoint(prev, cur, c, r);
+                i = stepPoint(c, r);
+                next[c][r] = i;
                 if (i > retVal) {
                     retVal = i;
                 }
@@ -99,8 +98,8 @@ class InnerNode extends Node {
     final Collection<Node> children;
     int max = Integer.MIN_VALUE;
 
-    InnerNode(int left, int top, int right, int bottom, int height, int width) {
-        super(left, top, right, bottom, height, width);
+    InnerNode(int[][] start, int left, int top, int right, int bottom, int height, int width) {
+        super(start, left, top, right, bottom, height, width);
         children = new ArrayList(4);
         int wMid = (left + right) / 2;
         if (wMid == left) {
@@ -111,15 +110,15 @@ class InnerNode extends Node {
             hMid = bottom;
         }
         if ((right - left) * (bottom - top) > THREASHOLD) {
-            children.add(new InnerNode(left, top, wMid, hMid, height, width));
-            children.add(new InnerNode(wMid, top, right, hMid, height, width));
-            children.add(new InnerNode(left, hMid, wMid, bottom, height, width));
-            children.add(new InnerNode(wMid, hMid, right, bottom, height, width));
+            children.add(new InnerNode(start, left, top, wMid, hMid, height, width));
+            children.add(new InnerNode(start, wMid, top, right, hMid, height, width));
+            children.add(new InnerNode(start, left, hMid, wMid, bottom, height, width));
+            children.add(new InnerNode(start, wMid, hMid, right, bottom, height, width));
         } else {
-            children.add(new LeafNode(left, top, wMid, hMid, height, width));
-            children.add(new LeafNode(wMid, top, right, hMid, height, width));
-            children.add(new LeafNode(left, hMid, wMid, bottom, height, width));
-            children.add(new LeafNode(wMid, hMid, right, bottom, height, width));
+            children.add(new LeafNode(start, left, top, wMid, hMid, height, width));
+            children.add(new LeafNode(start, wMid, top, right, hMid, height, width));
+            children.add(new LeafNode(start, left, hMid, wMid, bottom, height, width));
+            children.add(new LeafNode(start, wMid, hMid, right, bottom, height, width));
         }
     }
 
@@ -145,21 +144,34 @@ class InnerNode extends Node {
 abstract class Node extends RecursiveTask<Integer> {
 
     final int left, top, right, bottom, height, width;
-
-    Node(int left, int top, int right, int bottom, int height, int width) {
+    final int[][] start;
+    protected int[][] next;
+    
+    Node(int[][] start, int left, int top, int right, int bottom, int height, int width) {
+        this.start = start;
         this.left = left;
         this.top = top;
         this.right = right;
         this.bottom = bottom;
         this.height = height;
         this.width = width;
+        next = new int[height][];
+        for( int i = top; i < bottom; ++i ) {
+            next[i] = new int[width];
+        }
     }
 
     @Override
     protected abstract Integer compute();
-
+    
     abstract int getMax();
+    /**
+     * 
+     * @return The array used to hold the next frame
+     */
+    public final int[][] getArray() {
+        return start;
+    }
 }
-
-    // end copied classes for Jacobi computations
+// end copied classes for Jacobi computations
     
