@@ -150,12 +150,10 @@ public class JacobiServer {
     
     class LeafNode extends Node {
 
-        final JacobiDemoFJ demo;
         int max = Integer.MIN_VALUE;
 
-        LeafNode(JacobiDemoFJ demo, int left, int top, int right, int bottom) {
-            super(left, top, right, bottom);
-            this.demo = demo;
+        LeafNode(int left, int top, int right, int bottom, int height, int width) {
+            super(left, top, right, bottom, height, width);
         }
 
         int stepPoint(int[][] from, int[][] to, int w, int h) {
@@ -170,12 +168,12 @@ public class JacobiServer {
             } else {
                 u = 0;
             }
-            if (w + 1 < demo.width) {
+            if (w + 1 < this.width) {
                 r = 1;
             } else {
                 r = 0;
             }
-            if (h + 1 < demo.height) {
+            if (h + 1 < this.height) {
                 d = 1;
             } else {
                 d = 0;
@@ -272,13 +270,15 @@ public class JacobiServer {
 
     abstract class Node extends RecursiveTask<Integer> {
 
-        final int left, top, right, bottom;
+        final int left, top, right, bottom, height, width;
 
-        Node(int left, int top, int right, int bottom) {
+        Node(int left, int top, int right, int bottom, int height, int width) {
             this.left = left;
             this.top = top;
             this.right = right;
             this.bottom = bottom;
+            this.height = height;
+            this.width = width;
         }
 
         @Override
