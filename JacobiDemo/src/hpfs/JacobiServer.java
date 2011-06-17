@@ -28,7 +28,7 @@ public class JacobiServer {
     private final Map<Long, MetaClient> clientMap;
     private final Selector selector; //All channels attach their clientId
 
-    public static void main(String [] args) {
+    public static void main(String[] args) {
         JacobiServer js = null;
         try {
             js = new JacobiServer();
@@ -45,7 +45,7 @@ public class JacobiServer {
     }
 
     private boolean addClient(String address) {
-        String [] addrParts = address.split(":",2);
+        String[] addrParts = address.split(":", 2);
         MetaClient client = null;
         long clientId = Long.MIN_VALUE;
         boolean retVal = false;
@@ -60,10 +60,11 @@ public class JacobiServer {
             s.getChannel().register(selector, SelectionKey.OP_READ, clientId);
             retVal = true;
         } catch (IOException ex) {
-            if(DEBUG) {
+            if (DEBUG) {
                 ex.printStackTrace();
             }
-        } catch(NumberFormatException ex) {}
+        } catch (NumberFormatException ex) {
+        }
         return retVal;
     }
 
@@ -77,23 +78,22 @@ public class JacobiServer {
 
     private boolean removeClient(long clientId) {
         MetaClient client = clientMap.remove(clientId);
-        if(client == null) {
+        if (client == null) {
             return false;
         }
         try {
             client.socket.close();
-        } catch(IOException ex) {
-            
+        } catch (IOException ex) {
         }
         return true;
     }
 
     public void printREPLHelp() {
-        
     }
 
     public void forkREPL() {
         new Thread() {
+
             @Override
             public void run() {
                 Scanner stdIn = new Scanner(System.in);
@@ -103,11 +103,11 @@ public class JacobiServer {
                 do {
                     System.out.print("> ");
                     s = stdIn.next();
-                    switch(s) {
+                    switch (s) {
                         case "a":
                         case "add":
                             s = stdIn.next();
-                            if(addClient(s)) {
+                            if (addClient(s)) {
                                 System.out.println("Successfully added " + s);
                             } else {
                                 System.out.println("Unable to add client");
@@ -120,7 +120,7 @@ public class JacobiServer {
                         case "r":
                         case "remove":
                             l = stdIn.nextLong();
-                            if(removeClient(l)) {
+                            if (removeClient(l)) {
                                 System.out.println("Successfully removed client: " + l);
                             } else {
                                 System.out.println("Unable to remove client");
@@ -130,170 +130,30 @@ public class JacobiServer {
                             printREPLHelp();
                             break;
                     }
-                } while(!s.equalsIgnoreCase("q") && !s.equalsIgnoreCase("quit"));
+                } while (!s.equalsIgnoreCase("q") && !s.equalsIgnoreCase("quit"));
             }
         }.start();
     }
 
     private static class MetaClient {
+
         final Socket socket;
         final ObjectOutputStream out;
         final ObjectInputStream in;
+
         MetaClient(Socket s) throws IOException {
             socket = s;
             out = new ObjectOutputStream(s.getOutputStream());
             in = new ObjectInputStream(s.getInputStream());
         }
     }
-    
-    // copied from JacobiDemoFJ
-    
-    class LeafNode extends Node {
 
-        int max = Integer.MIN_VALUE;
-
-        LeafNode(int left, int top, int right, int bottom, int height, int width) {
-            super(left, top, right, bottom, height, width);
-        }
-
-        int stepPoint(int[][] from, int[][] to, int w, int h) {
-            int l, r, u, d, nCount; // left, right, up, down
-            if (w != 0) {
-                l = 1;
-            } else {
-                l = 0;
-            }
-            if (h != 0) {
-                u = 1;
-            } else {
-                u = 0;
-            }
-            if (w + 1 < this.width) {
-                r = 1;
-            } else {
-                r = 0;
-            }
-            if (h + 1 < this.height) {
-                d = 1;
-            } else {
-                d = 0;
-            }
-            nCount = l + u + r + d;
-            double runVal = 0d;
-            if (l == 1) {
-                runVal += from[w - 1][h];
-            }
-            if (u == 1) {
-                runVal += from[w][h - 1];
-            }
-            if (r == 1) {
-                runVal += from[w + 1][h];
-            }
-            if (d == 1) {
-                runVal += from[w][h + 1];
-            }
-            runVal += from[w][h];
-            nCount++;
-            to[w][h] = (int) (runVal / nCount);
-            return to[w][h];
-        }
-
-        @Override
-        protected Integer compute() {
-            int[][] prev = demo.getPreviousData();
-            int[][] cur = demo.getCurrentData();
-            int retVal = Integer.MIN_VALUE, i;
-            for (int c = left; c < right; c++) {
-                for (int r = top; r < bottom; r++) {
-                    i = stepPoint(prev, cur, c, r);
-                    if (i > retVal) {
-                        retVal = i;
-                    }
-                }
-            }
-            return max = retVal;
-        }
-
-        @Override
-        int getMax() {
-            return max;
-        }
-    }
-
-    class InnerNode extends Node {
-
-        final Collection<Node> children;
-        int max = Integer.MIN_VALUE;
-
-        InnerNode(int left, int top, int right, int bottom) {
-            super(left, top, right, bottom);
-            children = new ArrayList(4);
-            int wMid = (left + right) / 2;
-            if (wMid == left) {
-                wMid = right;
-            }
-            int hMid = (top + bottom) / 2;
-            if (hMid == top) {
-                hMid = bottom;
-            }
-            if ((right - left) * (bottom - top) > THREASHOLD) {
-                children.add(new InnerNode(left, top, wMid, hMid));
-                children.add(new InnerNode(wMid, top, right, hMid));
-                children.add(new InnerNode(left, hMid, wMid, bottom));
-                children.add(new InnerNode(wMid, hMid, right, bottom));
-            } else {
-                children.add(new LeafNode(left, top, wMid, hMid));
-                children.add(new LeafNode(wMid, top, right, hMid));
-                children.add(new LeafNode(left, hMid, wMid, bottom));
-                children.add(new LeafNode(wMid, hMid, right, bottom));
-            }
-        }
-
-        @Override
-        protected Integer compute() {
-            int retVal = Integer.MIN_VALUE;
-            //invokeAll(children);
-            for (Node n : invokeAll(children)) {
-                if (n.getMax() > retVal) {
-                    retVal = n.getMax();
-                }
-                n.reinitialize();
-            }
-            return max = retVal;
-        }
-
-        @Override
-        int getMax() {
-            return max;
-        }
-    }
-
-    abstract class Node extends RecursiveTask<Integer> {
-
-        final int left, top, right, bottom, height, width;
-
-        Node(int left, int top, int right, int bottom, int height, int width) {
-            this.left = left;
-            this.top = top;
-            this.right = right;
-            this.bottom = bottom;
-            this.height = height;
-            this.width = width;
-        }
-
-        @Override
-        protected abstract Integer compute();
-
-        abstract int getMax();
-    }
-    
-    // end copied classes for Jacobi computations
-    
     private static class nextFrameTask extends RecursiveTask {
+
         private int[][] cur, prev;
         private int startx, starty, width, height;
-        
-        public nextFrameTask( int[][] frame, int startx, int starty, int width, int height ) {
+
+        public nextFrameTask(int[][] frame, int startx, int starty, int height, int width) {
             this.cur = frame;
             this.prev = frame;
             this.startx = startx;
@@ -301,19 +161,25 @@ public class JacobiServer {
             this.width = width;
             this.height = height;
         }
-        
+
         @Override
         protected Object compute() {
             // compute next frame of Jacobi; champ = max value in new array
-            int[][] temp = cur;
-            cur = prev;
-            prev = temp;
-        
-            
-            return max;
+            InnerNode compute = new InnerNode(prev, startx, starty, startx + width,
+                    starty + height, height, width);
+            int max = compute.invoke();
+
+            return compute.getArray();
         }
-        
-        
+    }
+
+    private static class renderImageTask extends RecursiveTask {
+
+        @Override
+        protected Object compute() {
+            return this;
+        }
+
         /**
          * Given a number and a max from a set, returns int [] BGR value from
          * blue to red.  b/max == 1 for Red, and b == 0 for Blue
@@ -327,13 +193,6 @@ public class JacobiServer {
             c[0] = (int) (percent * Byte.MAX_VALUE);
             c[2] = Byte.MAX_VALUE - c[0];
             return c;
-        }
-    }
-    
-    private static class renderImageTask extends RecursiveTask {
-        @Override
-        protected Object compute() {
-            return this;
         }
     }
 }
