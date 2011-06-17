@@ -12,6 +12,7 @@
    
     
     IBOutlet UIImageView *imgV;
+    BOOL test;
 }
 
 
