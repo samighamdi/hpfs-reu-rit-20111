@@ -1,5 +1,6 @@
 package hpfs;
 
+import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -174,10 +175,31 @@ public class JacobiServer {
     }
 
     private static class renderImageTask extends RecursiveTask {
-
+        
+        int[][] frame;
+        BufferedImage img;
+        int width, height, top, bottom, max;
+        public renderImageTask( int[][] frame, int width, int height, int top, int bottom, int max ) {
+            this.frame = frame;
+            img = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);   
+            this.width = width;
+            this.height = height;
+            this.top = top;
+            this.bottom = bottom;
+            this.max = max;
+        }
+        
         @Override
         protected Object compute() {
-            return this;
+            WritableRaster ras = img.getRaster();
+            for( int i = top; i < bottom; ++i ) {
+                for( int j = 0; j < width; ++j ) {
+                    ras.setPixel(i, j, makeBGR(frame[i][j], max));
+                }
+            }
+                
+                
+            return img;
         }
 
         /**
