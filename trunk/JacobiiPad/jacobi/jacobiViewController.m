@@ -33,15 +33,18 @@
 - (void) sendURLRequest:(CGPoint)point
 {
     
-    NSString *urlStr = [NSString stringWithFormat: @"http://kfd", point.x, point.y];
+    int trueX = (point.x * (imgV.image.size.height/1004.0));
+    int trueY = (point.y * (imgV.image.size.width/768.0));
+    
+    NSString *urlStr = [NSString stringWithFormat: @"http://kfd", trueX, trueY];
     
     
     NSURLRequest *urlReq = [NSURLRequest requestWithURL: [NSURL URLWithString:urlStr]];
     
     NSURLConnection *connect = [[NSURLConnection alloc] initWithRequest: urlReq delegate:self];
     
-    if(!connect)
-        NSLog(@"Connection failed");
+    NSLog(@"%d, %d, %@", trueX, trueY, NSStringFromCGSize(imgV.image.size));
+
     
     
     
@@ -51,14 +54,19 @@
 
 - (void) drawImage
 {
-    NSString *str;   
-    
-    if (rand() % 2) {
+    NSString *str; 
+    str = @"http://server.daquanne.com/images.php";
+    /*
+    if (test) {
         str = @"http://www.sprintwallpaper.com/images/wallpapers/70136098/Nature/Landscape%201/Landscape%2050.jpg";
+        test = NO;
     }
     else
+    {
         str = @"http://www.webdesign.org/img_articles/7072/BW-kitten.jpg";
-     
+        test = YES;
+    }
+     */
     
     UIImage *img = [[UIImage alloc] initWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:str]]];
     //UIImage *img = [self getImageWithUrl:str];
@@ -73,6 +81,7 @@
     
     
     [img release];
+    
     
     /*
     scrollView = (UIScrollView *)[self.view viewWithTag:100];
@@ -132,6 +141,8 @@
     
     [imageScrollView release];
      */
+    
+    test = YES;
     
     [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(drawImage) userInfo:nil repeats:YES];
     
