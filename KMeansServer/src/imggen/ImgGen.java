@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsEnvironment;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
@@ -24,6 +23,7 @@ public class ImgGen
 	private double maxX;
 	private double maxY;
 	
+	private int k;
 	private Rectangle2D pointsRec;
 	private BufferedImage pointsImg;
 	private BufferedImage gridImg;
@@ -31,10 +31,11 @@ public class ImgGen
 	
 	
 	
-	public ImgGen(double xmax, double ymax, boolean createGrid)
+	public ImgGen(double xmax, double ymax, boolean createGrid, int k)
 	{
 		maxX = xmax;
 		maxY = ymax;
+		this.k = k;
 		
 		Color colors[] = {Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW, Color.MAGENTA, 
 				Color.ORANGE, Color.PINK, Color.LIGHT_GRAY, Color.BLACK, Color.CYAN, Color.GRAY};
@@ -198,6 +199,15 @@ public class ImgGen
 		}
 		
 		
+		//draw cluster key
+		img.drawString("Clusters: ", 10, bi.getHeight() - 10);
+		
+		for(int i = 0; i < k; i++)
+		{
+			img.setColor(colors[i % colors.length]);
+			
+			img.drawString(Integer.toString(i), metrics.stringWidth("Clusters: ") + 70 + 10 * i, bi.getHeight() - 10);
+		}
 		
 		gridImg = bi;
 	}
@@ -214,41 +224,6 @@ public class ImgGen
 	}
 	
 	
-	public static void main(String args[])
-	{
-		Random rng = new Random();
-		double points[][] = new double[10000000][3];
-		
-		for(int i = 0; i < points.length; i++)
-		{
-			points[i][0] = i % 3;
-			points[i][1] = rng.nextDouble() * 100;
-			points[i][2] = rng.nextDouble() * 100;
-		}
-		
-		long time = -System.currentTimeMillis();
-		
-		
-		ImgGen ig1 = new ImgGen(100, 100, true);
-		ig1.generatePoints(points);
-		BufferedImage bi = ig1.getFullImg();
-		
-		
-		
-		
-		System.out.println(time + System.currentTimeMillis());
-		
-		JFrame win = new JFrame();
-		win.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		win.add(new JLabel(new ImageIcon(bi)));
-		
-		win.pack();
-		
-		win.setVisible(true);
-		
-		
-		
-	}
+	
 	
 }
