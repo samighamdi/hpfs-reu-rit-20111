@@ -9,9 +9,12 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -38,7 +41,7 @@ public class ImgGen
 		this.k = k;
 		
 		Color colors[] = {Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW, Color.MAGENTA, 
-				Color.ORANGE, Color.PINK, Color.LIGHT_GRAY, Color.BLACK, Color.CYAN, Color.GRAY};
+				Color.ORANGE, Color.PINK, Color.LIGHT_GRAY, Color.CYAN, Color.GRAY};
 		
 		this.colors = colors;
 		
@@ -113,17 +116,10 @@ public class ImgGen
 		
 	}
 	
-	
-	
-	
-	private void generateGrid()
+	private void drawLinesAndScale()
 	{
-		
-		
-		BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
-		Graphics2D img = bi.createGraphics();
-		
-		//these values are renamed so i dont have to change code
+		//using different variable names so i dont have to change code
+		Graphics2D img = gridImg.createGraphics();
 		Rectangle2D rec = pointsRec;
 		double gridPosX = rec.getX();
 		double gridPosY = rec.getY();
@@ -133,19 +129,14 @@ public class ImgGen
 		//units used to make the grid
 		double heightUnit = (1/20.0) * gridHeight;
 		double widthUnit = (1/20.0) * gridWidth;
-		
+
 		int numXLines = 1;
 		int numYLines = 1;
-		
-		
-		
-		
+
 		img.setColor(Color.BLACK); //set outline to black
 		img.setStroke(new BasicStroke(2)); //set the thickness of the outline
 		img.draw(rec); //draw the outline
-		img.setPaint(Color.WHITE); //make the grid white
-		img.fill(rec); //fill the shape
-		
+
 		
 		//draw the grid lines
 		img.setStroke(new BasicStroke((float).5));
@@ -200,14 +191,31 @@ public class ImgGen
 		
 		
 		//draw cluster key
-		img.drawString("Clusters: ", 10, bi.getHeight() - 10);
+		img.drawString("Clusters: ", 10, gridImg.getHeight() - 10);
 		
 		for(int i = 0; i < k; i++)
 		{
 			img.setColor(colors[i % colors.length]);
 			
-			img.drawString(Integer.toString(i), metrics.stringWidth("Clusters: ") + 70 + 10 * i, bi.getHeight() - 10);
+			img.drawString(Integer.toString(i), metrics.stringWidth("Clusters: ") + 70 + 10 * i, gridImg.getHeight() - 10);
 		}
+		
+	}
+	
+	
+	
+	
+	private void generateGrid()
+	{
+		
+		
+		BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR_PRE);
+		Graphics2D img = bi.createGraphics();
+		
+		img.setBackground(Color.WHITE);
+		img.clearRect(0, 0, width, height);
+		
+		
 		
 		gridImg = bi;
 	}
@@ -217,13 +225,58 @@ public class ImgGen
 	public BufferedImage getFullImg()
 	{
 		if(gridImg != null)
+		{
 			gridImg.createGraphics().drawImage(pointsImg, (int) pointsRec.getX(), (int) pointsRec.getY(), null);
+			drawLinesAndScale();
+		}
 		else
 			System.out.println("You never generated the grid!  And it's too late for that HAHA!");
 		return gridImg;
 	}
 	
 	
-	
+	public static void main(String args[])
+	{
+		Random rng = new Random();
+		double points[][] = new double[100000][3];
+		
+		for(int i = 0; i < points.length; i++)
+		{
+			points[i][0] = i % 3;
+			points[i][1] = rng.nextDouble() * 100;
+			points[i][2] = rng.nextDouble() * 100;
+		}
+		
+		
+		
+		
+		ImgGen ig1 = new ImgGen(100, 100, true, 3);
+		ig1.generatePoints(points);
+		BufferedImage bi = ig1.getFullImg();
+		
+		
+		
+		try {
+			ImageIO.write(bi, "png", new File("/Users/danielbokser/Desktop/blurb.png"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		JFrame win = new JFrame();
+		win.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
+		win.add(new JLabel(new ImageIcon(bi)));
+		
+		win.pack();
+		
+		win.setVisible(true);
+		
+		
+		
+	}
 	
 }
