@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Random;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -31,15 +30,16 @@ public class ImgGen
 	private BufferedImage pointsImg;
 	private BufferedImage gridImg;
 	private Color colors[];
+	private String title;
 	
 	
 	
-	public ImgGen(double xmax, double ymax, boolean createGrid, int k)
+	public ImgGen(double xmax, double ymax, boolean createGrid, int k, String title)
 	{
 		maxX = xmax;
 		maxY = ymax;
 		this.k = k;
-		
+		this.title = title;
 		Color colors[] = {Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW, Color.MAGENTA, 
 				Color.ORANGE, Color.PINK, Color.LIGHT_GRAY, Color.CYAN, Color.GRAY};
 		
@@ -200,6 +200,9 @@ public class ImgGen
 			img.drawString(Integer.toString(i), metrics.stringWidth("Clusters: ") + 70 + 10 * i, gridImg.getHeight() - 10);
 		}
 		
+		img.setColor(Color.BLACK);
+		img.setFont(new Font("Dialog", Font.BOLD, 20));
+		img.drawString(title, gridImg.getWidth()/2 - metrics.stringWidth(title), 25);
 	}
 	
 	
@@ -250,7 +253,7 @@ public class ImgGen
 		
 		
 		
-		ImgGen ig1 = new ImgGen(100, 100, true, 3);
+		ImgGen ig1 = new ImgGen(100, 100, true, 3, "Iteration");
 		ig1.generatePoints(points);
 		BufferedImage bi = ig1.getFullImg();
 		
