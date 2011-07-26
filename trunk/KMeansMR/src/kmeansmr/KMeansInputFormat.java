@@ -3,22 +3,30 @@ package kmeansmr;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.mapred.FileInputFormat;
-import org.apache.hadoop.mapred.FileSplit;
-import org.apache.hadoop.mapred.JobConf;
-import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 
-@SuppressWarnings("deprecation")
-public class KMeansInputFormat extends FileInputFormat<DoubleWritable, ArrayList<DoubleWritable>>{
+
+
+
+public class KMeansInputFormat extends FileInputFormat<IntWritable, ArrayList<DoubleWritable>>{
 
 	@Override
-	public org.apache.hadoop.mapred.RecordReader<DoubleWritable, ArrayList<DoubleWritable>> getRecordReader(
-			org.apache.hadoop.mapred.InputSplit split, JobConf arg1,
-			Reporter arg2) throws IOException {
+	public RecordReader<IntWritable, ArrayList<DoubleWritable>> createRecordReader(
+			InputSplit split, TaskAttemptContext arg1) throws IOException,
+			InterruptedException {
 		
-		return new KMeansRecordReader((FileSplit) split);
+		
+		return new KMeansRecordReader() ;
 	}
 
+
+	
+
+	
 	
 	
 

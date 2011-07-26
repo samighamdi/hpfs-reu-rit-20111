@@ -2,88 +2,87 @@ package kmeansmr;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-
-
 import org.apache.hadoop.io.DoubleWritable;
-
-import org.apache.hadoop.mapred.RecordReader;
-import org.apache.hadoop.mapred.FileSplit;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.mapreduce.InputSplit;
+import org.apache.hadoop.mapreduce.RecordReader;
+import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 import arrayfs.ArrayDoubleFS;
-@SuppressWarnings("deprecation")
-public class KMeansRecordReader implements RecordReader<DoubleWritable, ArrayList<DoubleWritable>> {
+
+public class KMeansRecordReader extends RecordReader<IntWritable, ArrayList<DoubleWritable>> {
 
 	private double points[][];
-	private int i;
 	
-	public KMeansRecordReader( FileSplit split)
-	{
+	private ArrayList<DoubleWritable> value;
+	private IntWritable key;
+	
+	@Override
+	public void close() throws IOException {
+		
+		
+	}
+
+	
+	@Override
+	public float getProgress() throws IOException {
+		
+		return (float)key.get() / (points.length - 1);
+	}
+
+	
+
+	@Override
+	public IntWritable getCurrentKey() throws IOException,
+			InterruptedException {
+		
+		return key;
+	}
+
+	@Override
+	public ArrayList<DoubleWritable> getCurrentValue() throws IOException,
+			InterruptedException {
+		
+		return value;
+	}
+
+	@Override
+	public void initialize(InputSplit inSplit, TaskAttemptContext arg1)
+			throws IOException, InterruptedException {
+		
+		key = new IntWritable(0);
+		value = new ArrayList<DoubleWritable>();
+		
+		FileSplit split = (FileSplit) inSplit;
+		
 		ArrayDoubleFS fr = null;
 		try {
 			fr = new ArrayDoubleFS(new File(split.getPath().toUri()));
 			points = fr.getArray();
 			fr.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		 i = 0;
-		 
-		
-	}
-	
-	@Override
-	public void close() throws IOException {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public DoubleWritable createKey() {
-		// TODO Auto-generated method stub
-		return new DoubleWritable();
-	}
-
-	@Override
-	public ArrayList<DoubleWritable> createValue() {
+	public boolean nextKeyValue() throws IOException, InterruptedException {
 		
-		return new ArrayList<DoubleWritable>();
-	}
-
-	@Override
-	public long getPos() throws IOException {
-		// TODO Auto-generated method stub
-		return i;
-	}
-
-	@Override
-	public float getProgress() throws IOException {
-		// TODO Auto-generated method stub
-		return i / (points.length - 1);
-	}
-
-	@Override
-	public boolean next(DoubleWritable key, ArrayList<DoubleWritable> point)
-			throws IOException {
+		key.set(key.get() + 1);
 		
-		key.set((double) i);
+		value.clear();
 		
-		for(int j = 0; j < points[i].length; j++)
-			point.add(new DoubleWritable(points[i][j]));
-		
-		i++;
-		
-		
+		for(int j = 0; j < points[key.get()].length; j++)
+			value.add(new DoubleWritable(points[key.get()][j]));
 		
 		return true;
 	}
