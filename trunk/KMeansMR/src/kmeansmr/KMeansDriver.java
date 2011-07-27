@@ -6,7 +6,7 @@ import java.text.ParseException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
 
-import arrayfs.ArrayDoubleFS;
+
 
 
 
@@ -18,13 +18,27 @@ public class KMeansDriver {
 	/**
 	 * Creates a kmeans hadoop job starts it and returns the job
 	 * @param pointsFN The file name of the points binary file
+	 * @param k number of clusters
 	 * @return the job that it started
 	 */
-	public static Job startJob(String pointsFN)
+	public static Job startJob(String pointsFN, int k)
 	{
 		
-		Configuration conf = createConfWithCentroids(pointsFN);
+		Configuration conf = createConfWithCentroids(pointsFN, k);
 		
+		System.out.println("Before iteration:");
+		
+		for(int i = 0; i < k; i++)
+		{
+			System.out.print("Cluster " + i + ": ");
+			
+			for(String str : conf.getStrings("Cluster" + i))
+			{
+				System.out.print(str + ", ");
+			}
+			
+			System.out.println("\n");
+		}
 		
 		Job job = null;
 		try {
@@ -66,7 +80,7 @@ public class KMeansDriver {
 	 * @return generated Configuration object 
 	 * @throws Exception 
 	 */
-	private static Configuration createConfWithCentroids(String pointsFN)
+	private static Configuration createConfWithCentroids(String pointsFN, int k)
 	{
 		Configuration conf = new Configuration();
 		
@@ -91,7 +105,7 @@ public class KMeansDriver {
 
 		//get the centroids (cluster coordinates)
 		//any point's array length is equal to k
-		double clusters[][] = clusterPlusPlus(points[0].length, points);
+		double clusters[][] = clusterPlusPlus(k, points);
 		String clusterCoords[] = new String[points[0].length]; //will hold a cluster's coordinates
 
 
@@ -104,18 +118,18 @@ public class KMeansDriver {
 				clusterCoords[j] = Double.toString(clusters[i][j]);
 			}
 
-			conf.setStrings("Cluster" + Integer.toString(i), clusterCoords);
+			conf.setStrings("Cluster" + i, clusterCoords);
 		}
-
+		
+		conf.setInt("k", k);
 
 
 
 		return conf;
 	}
 	
-	 public static double[][] clusterPlusPlus(int k, double points[][]) {
+	 private static double[][] clusterPlusPlus(int k, double points[][]) {
 	        double clusters[][] = new double [k][points[0].length];
-	        double[] in = points[(int)(Math.random() * points.length)];
 	        // for each remaining cluster
 	        for( int i = 1; i < k; ++i ) {
 	            double[] cum = new double[points.length]; // cumulative distribution
@@ -124,13 +138,11 @@ public class KMeansDriver {
 	                double p[] = points[m];
 	                // choose the nearest cluster
 	                double pfit = Double.NEGATIVE_INFINITY;
-	                int choice = 0;
 	                // for each initialized cluster
 	                for( int j = 0; j < i; ++j ) {
 	                    double fit = fitness(p, clusters[j]);
 	                    if( pfit < fit ) {
 	                        pfit = fit;
-	                        choice = j;
 	                    }
 	                }
 	                if( m > 0 ) {
@@ -165,9 +177,9 @@ public class KMeansDriver {
 	 
 	 private static boolean isSameCoords(double a[], double b[])
 	 {
-		 int length = (a.length >= b.length) ? a.length : b.length;
 		 
-		 for(int i = 0; i < length; i++)
+		 
+		 for(int i = 0; i < a.length; i++)
 		 {
 			 if(a[i] != b[i])
 				 return false;
@@ -176,7 +188,7 @@ public class KMeansDriver {
 		 return true;
 	 }
 	 
-	 private static double fitness( double[] a, double[] b ) {
+	 public static double fitness( double[] a, double[] b ) {
 	        double total = 0;
 	        for( int i = 0; i < a.length; ++i ) {
 	            total += Math.pow((a[i] - b[i]),2);
