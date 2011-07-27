@@ -12,7 +12,7 @@ import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
-import arrayfs.ArrayDoubleFS;
+
 
 public class KMeansRecordReader extends RecordReader<IntWritable, ArrayList<DoubleWritable>> {
 
