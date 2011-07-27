@@ -14,6 +14,6 @@ abstract class ArrayFS {
     public static final byte DOUBLE = 8;
     public static final byte LONG = 8;
     
-    protected static final byte HEADERSIZE = 17;
+    protected static final byte HEADERSIZE = 13;
     protected static final int BUFFERSIZE = 1000;
 }

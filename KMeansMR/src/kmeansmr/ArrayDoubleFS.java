@@ -22,7 +22,7 @@ import java.util.UUID;
 public class ArrayDoubleFS extends ArrayFS {
     
     private byte type;
-    private long innerSize;
+    private int innerSize;
     private long size;
     private long position;
     private String filename;
@@ -34,7 +34,7 @@ public class ArrayDoubleFS extends ArrayFS {
      * @param   innerSize   The size of all inner arrays in a two-dimensional array. This size cannot be changed after instantiation.
      */
     
-    public ArrayDoubleFS(long innerSize) throws FileNotFoundException, IOException {
+    public ArrayDoubleFS(int innerSize) throws FileNotFoundException, IOException {
         this(UUID.randomUUID().toString().replace('-', '0'), innerSize);
     }
     
@@ -44,7 +44,7 @@ public class ArrayDoubleFS extends ArrayFS {
      * @param   name    The name of the file
      * @param   innerSize   The size of all inner arrays in a two-dimensional array. This size cannot be changed after instantiation.
      */
-    public ArrayDoubleFS(String name, Long innerSize) throws FileNotFoundException, IOException {
+    public ArrayDoubleFS(String name, int innerSize) throws FileNotFoundException, IOException {
         type = DOUBLE;
         size = 0;
         this.innerSize = innerSize;
@@ -96,8 +96,8 @@ public class ArrayDoubleFS extends ArrayFS {
             fs = new RandomAccessFile(file, "rw");
             type = fs.readByte();
             size = fs.readLong();
-            innerSize = fs.readLong();
-            seek(0);
+            innerSize = fs.readInt();
+            fs.seek(HEADERSIZE);
             filename = file.getName();
         }
         catch (EOFException ex) {
@@ -109,14 +109,14 @@ public class ArrayDoubleFS extends ArrayFS {
         fs.seek(0);
         fs.writeByte(type);
         fs.writeLong(size);
-        fs.writeLong(innerSize);
+        fs.writeInt(innerSize);
     }
     
     private void readHeader() throws IOException {
         fs.seek(0);
         type = fs.readByte();
         size = fs.readLong();
-        innerSize = fs.readLong();
+        innerSize = fs.readInt();
     }
     
     private long writeData(final double[][] array) throws IOException {
@@ -147,7 +147,7 @@ public class ArrayDoubleFS extends ArrayFS {
         byte type = source.readByte();
         if (type == this.type) {
             long size = source.readLong();
-            long innerSize = source.readLong();
+            long innerSize = source.readInt();
             copyData(source, destination, 0, size);
             return size;
         }
@@ -192,6 +192,22 @@ public class ArrayDoubleFS extends ArrayFS {
         fs.seek(HEADERSIZE + type * innerSize * size);
         size += writeData(array);
         writeHeader();
+    }
+    
+    /**
+     * Overwrites the portion of the array file beginning at the index specified with the array inserted
+     * 
+     * @param   array   The array to overwrite the portion of this file with
+     * @param   start   The index of the array file to start
+     */
+    public void overwite(final double[][] array, long start) throws IOException {
+        if (start >= 0 && start + array.length < size) {
+            seek(start);
+            writeData(array);
+        }
+        else {
+            throw new ArrayIndexOutOfBoundsException();
+        }
     }
     
     
@@ -324,7 +340,7 @@ public class ArrayDoubleFS extends ArrayFS {
      * 
      * @return      The length of the inner arrays
      */
-    public long innerSize() {
+    public int innerSize() {
         return innerSize;
     }
     
