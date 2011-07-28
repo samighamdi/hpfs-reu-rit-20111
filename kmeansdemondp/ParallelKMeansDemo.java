@@ -62,11 +62,11 @@ public class ParallelKMeansDemo extends KMeansDemo {
 	
 	public void prepareClusters(boolean parallel) {
 		for(int i = 0; i < points.length; i++) {
-                        double[] dp = points[i];
+                        DemoPoint dp = points[i];
 			int c = (int)(k*rng.nextDouble());
 			//System.out.println(dp + " assigned to clu " + c);
 			if( dp != null ) 
-				DPoint.setCluster(c, dp);
+				dp.setCluster(c);
 		}
 		if( parallel ) {
 			updateStep();
@@ -94,7 +94,7 @@ public class ParallelKMeansDemo extends KMeansDemo {
         
     	// System.out.println("rank: " + this.rank);
         for( int i = 0 ; i < k ; ++i ) {
-        	DPoint.setCoords( assignments[i], clusters[i] );
+        	clusters[i].setCoords( assignments[i]  );
         }
     }
     
@@ -118,9 +118,9 @@ public class ParallelKMeansDemo extends KMeansDemo {
         int[] count = new int[k];
         //System.out.println("updatestep - getStart " + getStart() + " getEnd " + getEnd());
         for( int i = getStart(); i < getEnd(); ++i ) {
-            double[] p = points[i];
-            double[] coords = DPoint.getCoords(p);
-            int c = DPoint.getCluster(p);
+            DemoPoint p = points[i];
+            double[] coords = p.getCoords();
+            int c = p.getCluster();
             for( int j = 0; j < d; ++j ) {
                 totals[c][j] += coords[j];
             }
@@ -149,14 +149,14 @@ public class ParallelKMeansDemo extends KMeansDemo {
 	        // for each cluster, set his position to the average of his points
 	        for( int i = 0; i < k; ++i ) {
 	            if( clusters[i] == null ) {
-	                clusters[i] = DPoint.dPoint( totals[i], i );
+	                clusters[i] = new DemoPoint( totals[i], i );
 	                changedFlag = true;
 	                continue;
 	            }
-	            double[] before = DPoint.getCoords(clusters[i]);
+	            double[] before = clusters[i].getCoords();
 	            for( int j = 0; j < d; ++j ) {
 	                if( before[j] != totals[i][j] ) {
-	                    DPoint.setCoords(totals[i], clusters[i]);
+	                    clusters[i].setCoords(totals[i] );
 	                    changedFlag = true;
 	                    break;
 	                }

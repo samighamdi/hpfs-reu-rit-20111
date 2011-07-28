@@ -88,7 +88,7 @@ public class ImgGen
 	
 	
 	
-	public void generatePoints(double points[][])
+	public void generatePoints(DemoPoint[] points)
 	{
 		BufferedImage pointsImg = new BufferedImage((int)pointsRec.getWidth() + 10, 
 				(int)pointsRec.getHeight() + 10, BufferedImage.TYPE_4BYTE_ABGR_PRE);
@@ -106,9 +106,10 @@ public class ImgGen
 		//draw the circles
 		for(int i = 0; i < points.length; i++)
 		{
-			img.setPaint(colors[(int)points[i][0] % colors.length]); 
-			img.fill(new Ellipse2D.Double(points[i][1] * xRatio - 2, pointsRec.getHeight() - 
-					(points[i][2] * yRatio ), 4, 4));
+                        double point[] = points[i].getCoords();
+			img.setPaint(colors[(int)points[i].getCluster() % colors.length]); 
+			img.fill(new Ellipse2D.Double(point[0] * xRatio - 2, pointsRec.getHeight() - 
+					(point[1] * yRatio ), 4, 4));
 		}
 		
 		

@@ -5,11 +5,14 @@
 package kmeansdemondp;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -66,18 +69,20 @@ public class KMeansServer {
                                     while (getSize() == -1 || count < getSize()) {
                                         
                                         byte[] h = new byte[9];
-                                        frontend.getInputStream().read(h, 0, 9);
+                                        new DataInputStream(frontend.getInputStream()).readFully(h, 0, 9);
                                         
-                                        out.print(h);
-                                        
+                                        client.getOutputStream().write(h);
+                                        client.getOutputStream().write(new byte[]{0});
                                         String sizeString = new String(h);
+                                        System.out.println(sizeString);
                                         int size = Integer.parseInt(sizeString);
                                         
                                         frontend.getInputStream().read();
                                         
                                         byte[] imageBytes = new byte[size];
-                                        frontend.getInputStream().read(imageBytes, 0, size);
-                                        out.write(imageBytes);
+                                        new DataInputStream(frontend.getInputStream()).readFully(imageBytes, 0, size);
+
+                                        client.getOutputStream().write(imageBytes);
                                         count++;
                                     }
 

@@ -55,17 +55,17 @@ public class KMeansDemo extends KMeans {
      */
     public static void prepareArrayFS( String arrayfile, int dimension, int numPoints, int maxiter, long seed ) throws IOException {
     	ArrayDoubleFS outfs = new ArrayDoubleFS(arrayfile, dimension+1);
-		DPoint.setDimension(dimension);
+		DemoPoint.setDimension(dimension);
         Random rng = Random.getInstance(seed);
         
         while( numPoints > 0 ) {
-            double[][] points = new double[maxiter][dimension+1];
+            DemoPoint[] points = new DemoPoint[maxiter];
             int count = 0;
         	while( count < maxiter ) {
-        		points[count] = DPoint.dPoint( rng );
+        		points[count] = new DemoPoint( rng );
         		++count;
         	}
-			outfs.append(points);
+			outfs.append(DemoPointArray.toArray(points));
 			numPoints -= maxiter;
         }
         
@@ -74,7 +74,7 @@ public class KMeansDemo extends KMeans {
     @Override
     public void prepareClusters() {
         for( int i = 0 ; i < k ; ++i ) {
-            clusters[i] = DPoint.dPoint( rng, i );
+            clusters[i] = new DemoPoint( rng, i );
         }        
     }
     

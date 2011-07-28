@@ -25,8 +25,8 @@ public abstract class KMeans {
     public static final String FILE_FORMAT = "png";
     public static final String CHART_TITLE = "K-Means Clustering";
     protected int size, k, d;
-    protected double[][] points;
-    protected double[][] clusters;
+    protected DemoPoint[] points;
+    protected DemoPoint[] clusters;
     protected double[] maxPoints;
     protected boolean changedFlag = true;
     protected long seed;
@@ -124,19 +124,19 @@ public abstract class KMeans {
     
    public void prepareData(String infile) {
 		
-		DPoint.setDimension(this.d);
+		DemoPoint.setDimension(this.d);
 		try {
 			ArrayDoubleFS myfs = new ArrayDoubleFS( infile, this.d );
 			myfs.seek(start);
-			this.points = myfs.getNext( size );
-			this.clusters = new double[k][];
-			for( int i = 0 ; i < size; ++i ) {
-				for( int  j = 0 ; j < d ; ++j ) {
-					if( points[i][j] > maxPoints[j] ) {
-						maxPoints[j] = points[i][j];
-					}
-				}
-			}	
+			this.points = DemoPointArray.toDemoPoints(myfs.getNext( size ));
+			this.clusters = new DemoPoint[k];
+//			for( int i = 0 ; i < size; ++i ) {
+//				for( int  j = 0 ; j < d ; ++j ) {
+//					if( points[i][j] > maxPoints[j] ) {
+//						maxPoints[j] = points[i][j];
+//					}
+//				}
+//			}	
 		} catch( IOException e) {
 			throw new RuntimeException(e); // gotta make it out somehow
 		}
@@ -149,21 +149,21 @@ public abstract class KMeans {
      * postcondition: clusters is initialized according to the kmeans++ algorithm
      */
     public void clusterPlusPlus() {
-        clusters = new double[k][];
-        double[] in = DPoint.getCoords(points[(int)(rng.nextDouble() * points.length)]);
-        clusters[0] = DPoint.dPoint( in, 0 );
+        clusters = new DemoPoint[k];
+        double[] in = points[(int)(rng.nextDouble() * points.length)].getCoords();
+        clusters[0] = new DemoPoint( in, 0 );
         // for each remaining cluster
         for( int i = 1; i < k; ++i ) {
             double[] cum = new double[points.length]; // cumulative distribution
             // for each data point assign it to the nearest cluster
             for( int m = 0; m < points.length; ++m ) {
-                double[] p = points[m];
+                DemoPoint p = points[m];
                 // choose the nearest cluster
                 double pfit = Double.NEGATIVE_INFINITY;
                 // for each initialized cluster
                 for( int j = 0; j < i; ++j ) {
                     int choice = 0;
-                    double fit = KMeans.fitness(DPoint.getCoords(p), DPoint.getCoords(clusters[j]));
+                    double fit = KMeans.fitness(p.getCoords(), clusters[j].getCoords());
                     if( pfit < fit ) {
                         pfit = fit;
                         choice = j;
@@ -180,9 +180,9 @@ public abstract class KMeans {
                 double choice = rng.nextDouble()*cum[cum.length-1];
                 position = 0;
                 while( choice > cum[position] ) ++position;
-            } while( DPoint.getCluster(points[position]) != -1 );
+            } while( points[position].getCluster() != -1 );
             
-            clusters[i] = DPoint.dPoint(DPoint.getCoords(points[position]), i);
+            clusters[i] = new DemoPoint(points[position].getCoords(), i);
         }
     }
     
@@ -222,13 +222,13 @@ public abstract class KMeans {
         //for( DemoPoint p : points ) {
     	//System.out.println( "getStart: " + getStart() + " and end " + getEnd());
         for( int dpp = getStart() ; dpp < getEnd(); ++dpp ) {
-            double[] p = points[dpp];
+            DemoPoint p = points[dpp];
             double min = Double.MAX_VALUE;
-            double[] pc = DPoint.getCoords(p);
-            int choice = DPoint.DEFAULT_CLUSTER;
-            for(double[] cluster : clusters) {
+            double[] pc = p.getCoords();
+            int choice = DemoPoint.DEFAULT_CLUSTER;
+            for(DemoPoint cluster : clusters) {
                 double my = 0;
-                double[] center = DPoint.getCoords(cluster);
+                double[] center = cluster.getCoords();
                 //System.out.println( "before fitness" + Arrays.toString(pc) + "\n" + Arrays.toString(center));
                 my = fitness(center, pc);
                 
@@ -239,11 +239,11 @@ public abstract class KMeans {
                 / /*/
                 if( my < min ) {
                     min = my;
-                    choice = DPoint.getCluster(cluster);
+                    choice = cluster.getCluster();
                 }
             }
             //System.out.println("choice " + choice );
-            DPoint.setCluster(choice, p);
+            p.setCluster(choice);
         }
     }
     
@@ -259,9 +259,9 @@ public abstract class KMeans {
                 totals[i][j] = 0;
             
         int[] count = new int[k];
-        for(double[] p : points) {
-            double[] coords = DPoint.getCoords(p);
-            int c = DPoint.getCluster(p);
+        for(DemoPoint p : points) {
+            double[] coords = p.getCoords();
+            int c = p.getCluster();
             for( int i = 0; i < d; ++i ) {
                 totals[c][i] += coords[i];
             }
@@ -279,14 +279,14 @@ public abstract class KMeans {
         // for each cluster, set his position to the average of his points
         for( int i = 0; i < k; ++i ) {
             if( clusters[i] == null ) {
-                clusters[i] = DPoint.dPoint( totals[i], i );
+                clusters[i] = new DemoPoint( totals[i], i );
                 changedFlag = true;
                 continue;
             }
-            double[] before = DPoint.getCoords(clusters[i]);
+            double[] before = clusters[i].getCoords();
             for( int j = 0; j < d; ++j ) {
                 if( before[j] != totals[i][j] ) {
-                    DPoint.setCoords(totals[i], clusters[i]);
+                    clusters[i].setCoords(totals[i]);
                     changedFlag = true;
                     break;
                 }
@@ -301,7 +301,7 @@ public abstract class KMeans {
     public double[][] clusterCenters() {
         double[][] ret = new double[k][d];
         for( int i = 0 ; i < k ; ++i) {
-            ret[i] = DPoint.getCoords(clusters[i]);
+            ret[i] = clusters[i].getCoords();
         }
         return ret;
     }
@@ -315,20 +315,22 @@ public abstract class KMeans {
     	int range = getEnd() - getStart();
     	int[] val = new int[range];
     	for( int i = 0; i < range; ++i ) {
-    		val[i] = DPoint.getCluster(points[i + getStart()]);
+    		val[i] = points[i + getStart()].getCluster();
     	}
     	return edu.rit.mp.IntegerBuf.buffer( val );
     }
+	public DemoPoint[] pointsData() {
+		return points;
+	}
     
-    public void printStatus(PrintStream out) {
+public void printStatus(PrintStream out) {
         if( out == null ) { 
             out = System.out;
         }
-        for( double[] dp : clusters ) {
-        	if(dp == null) continue;
-            out.println( "Cluster " + DPoint.getCluster(dp) + " at coords: " );
+        for( DemoPoint dp : clusters ) {
+            out.println( "Cluster " + dp.getCluster() + " at coords: " );
             for( int i = 0 ; i < d; ++i ) {
-                out.print( DPoint.getCoords(dp)[i] + " " );
+                out.print( dp.getCoords()[i] + " " );
             }
             out.println();
         }
@@ -340,37 +342,21 @@ public abstract class KMeans {
      * @param out the stream to print on
      */
     public void printUnclusteredData(PrintStream out) {
-        for( double[] dp : points ) {
-            out.println( DPoint.getCoords(dp)[0] + " " + DPoint.getCoords(dp)[1]);
+        for( DemoPoint dp : points ) {
+            out.println( dp.getCoords()[0] + " " + dp.getCoords()[1]);
         }
     }
-
-	public double[][] pointsData() {
-		return points;
-	}
     
-    public double[][][] clusterData() {
-        double[][][] clus = new double[k][][];
-        
-        long[] clusterSizes = new long[k];
-        
+    public ArrayList<ArrayList<DemoPoint>> clusterData() {
+        ArrayList<ArrayList<DemoPoint>> clus = new ArrayList<ArrayList<DemoPoint>>();
+        for( int i = 0; i < k; ++i ) {
+            clus.add(i, new ArrayList<DemoPoint>());
+        }
         for( int i = 0; i < size; ++i) {
-            int assignment = DPoint.getCluster(points[i]);
-            if ( assignment == DPoint.DEFAULT_CLUSTER ) continue;
-            if (clus[assignment] == null) clus[assignment] = new double[size][];
-            clus[assignment][(int)(clusterSizes[assignment]++)] = points[i];
+            int assignment = points[i].getCluster();
+            if( assignment == DemoPoint.DEFAULT_CLUSTER ) continue;
+            clus.get(assignment).add(points[i]);
         }
-        
-        for (int i = 0; i < clusterSizes.length; i++) {
-            if (clusterSizes[i] > 0) {
-                double[][] temp = clus[i];
-                clus[i] = null;
-                double[][] newCluster = new double[(int)clusterSizes[i]][];
-                System.arraycopy(temp, 0, newCluster, 0, newCluster.length);
-                clus[i] = newCluster;
-            }
-        }
-        
         return clus;
     }
     
@@ -387,20 +373,15 @@ public abstract class KMeans {
      * @return k by rd by cluster size (variable) array
      */
     public double[][][] clusterDataAsArray(int rd) {
-        double[][][] clus = clusterData();
-        double[][][] ret = new double[clus.length][][];
+        ArrayList<ArrayList<DemoPoint>> clus = clusterData();
+        double[][][] ret = new double[clus.size()][][];
         for( int i = 0 ; i < ret.length; ++i ) {
-            double[][] elemsInCluster = clus[i];
-            if (elemsInCluster != null) {
-                ret[i] = new double[rd][elemsInCluster.length];
-                for( int j = 0; j < elemsInCluster.length; ++j ) {
-                    for( int innie = 0 ; innie < rd; ++innie ) {
-                        ret[i][innie][j] = DPoint.getCoords(elemsInCluster[j])[innie];
-                    }
+            ArrayList<DemoPoint> elemsInCluster = clus.get(i);
+            ret[i] = new double[rd][elemsInCluster.size()];
+            for( int j = 0; j < elemsInCluster.size(); ++j ) {
+                for( int innie = 0 ; innie < rd; ++innie ) {
+                    ret[i][innie][j] = elemsInCluster.get(j).getCoords()[innie];
                 }
-            }
-            else {
-                ret[i] = new double[rd][0];
             }
         }
         return ret;
@@ -414,19 +395,14 @@ public abstract class KMeans {
      * @return a k x elems.length x cluster size (variable) array
      */
     public double[][][] clusterDataAsArray(int[] elems) {
-        double[][][] clus = clusterData();
-        double[][][] ret = new double[clus.length][elems.length][];
+        ArrayList<ArrayList<DemoPoint>> clus = clusterData();
+        double[][][] ret = new double[clus.size()][elems.length][];
         for( int i = 0 ; i < ret.length ; ++ i ) {//for each cluster
-            double[][] elemsInCluster = clus[i];
+            ArrayList<DemoPoint> elemsInCluster = clus.get(i);
             for( int j = 0 ; j < elems.length; ++j ) {//for each coordinate
-                if (elemsInCluster != null) {
-                    ret[i][j] = new double[elemsInCluster.length];
-                    for( int m = 0; m < elemsInCluster.length; ++m ) {//for each data point
-                        ret[i][j][m] = DPoint.getCoords(elemsInCluster[m])[elems[j]];
-                    }
-                }
-                else {
-                    ret[i][j] = new double[0];
+                ret[i][j] = new double[elemsInCluster.size()];
+                for( int m = 0; m < elemsInCluster.size(); ++m ) {//for each data point
+                    ret[i][j][m] = elemsInCluster.get(m).getCoords()[elems[j]];
                 }
             }
         }
@@ -439,12 +415,13 @@ public abstract class KMeans {
      * @param out the stream to print on
      */
     public void printClusteredData(PrintStream out) {
-        double[][][] clus = clusterData();
-        for (int i = 0; i < clus.length; i++) {
-            if( clus[i] == null || clus[i].length == 0 ) continue;
-            out.println( "Cluster " + DPoint.getCluster(clus[i][0]) );
-            for (int j = 0; j < clus[i].length; j++) {
-                out.println( DPoint.getCoords(clus[i][j])[0] + " " + DPoint.getCoords(clus[i][j])[1]);
+        ArrayList<ArrayList<DemoPoint>> clus = clusterData();
+        
+        for( ArrayList<DemoPoint> c : clus ) {
+            if( c.isEmpty() ) continue;
+            out.println( "Cluster " + c.get(0).getCluster() );
+            for( DemoPoint pt : c ) {
+                out.println( pt.getCoords()[0] + " " + pt.getCoords()[1]);
             }
             out.println();
         }

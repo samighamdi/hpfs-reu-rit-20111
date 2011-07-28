@@ -50,12 +50,13 @@ public class Census extends ParallelKMeans {
 		}
 		inst.size = count;
 		inst.k = CENSUS_K;
-		inst.points = new double[count][CENSUS_D];
-		inst.clusters = new double[CENSUS_K][CENSUS_D];
+                DemoPoint.setDimension(CENSUS_D);
+		inst.points = new DemoPoint[count];
+		inst.clusters = new DemoPoint[CENSUS_K];
 		
 		Iterator<String> lit = lines.iterator();
 		for( int i = 0 ; i < count && lit.hasNext(); ++i) {
-			inst.points[i] = DPoint.dPoint(parseCensusLine( lit.next() ));
+			inst.points[i] = new DemoPoint(parseCensusLine( lit.next() ));
 		}
 		inst.prepareClusters();
 		return inst;
@@ -94,7 +95,7 @@ public class Census extends ParallelKMeans {
 			return;
 		}
 		int count = 0 ;
-		for( double[] p : me.points ) {
+		for( DemoPoint p : me.points ) {
 			++count;
 			if( count % 100 == 0 );
 				//System.out.println( Arrays.toString(p));

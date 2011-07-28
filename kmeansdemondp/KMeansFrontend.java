@@ -19,6 +19,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.DecimalFormat;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 /**
@@ -70,8 +72,17 @@ public class KMeansFrontend {
             LongBuf buf = LongBuf.buffer(longParams);
             localWorld.floodReceive(buf, new CommRequest());
             localWorld.floodSend(buf);
-        kmeans = new ParallelIris(localWorld, subRank);
-        kmeans.startKMeans("kmeansdemopoints", 10);
+        kmeans = new ParallelKMeans(localWorld, subRank);
+        new Thread() {
+            public void run() {
+                try {
+                    kmeans.startKMeans("kmeansdemopoints", 10);
+                } catch (IOException ex) {
+                    
+                }
+            }
+        }.start();
+            
     }
 
     public BufferedImage getDisplay() {
@@ -86,6 +97,7 @@ public class KMeansFrontend {
             }
 
         }
+        System.out.println("Images Available: " + imageList.size());
         return imageList.removeFirst();
     }
 
@@ -95,7 +107,9 @@ public class KMeansFrontend {
             ByteArrayOutputStream imageBytes = new ByteArrayOutputStream();
             ImageIO.write(getDisplay(), "png", imageBytes);
             PrintStream out = new PrintStream(client.getOutputStream());
+            System.out.println("Image Size: " + imageBytes.toByteArray().length);
             out.print(new DecimalFormat("000000000").format(imageBytes.toByteArray().length));
+            System.out.println("sizeString: " + new DecimalFormat("000000000").format(imageBytes.toByteArray().length));
             client.getOutputStream().write(new byte[]{0});
             imageBytes.writeTo(client.getOutputStream());
             imageBytes.close();

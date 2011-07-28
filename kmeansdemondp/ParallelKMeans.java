@@ -74,23 +74,23 @@ public class ParallelKMeans extends KMeans {
     }
     
     public void prepareData( String infile ) {
-		DPoint.setDimension(this.d);
+		DemoPoint.setDimension(this.d);
 		try {
 			ArrayDoubleFS myfs = new ArrayDoubleFS( new File(infile + ".adfs") );
-			System.out.println( "myfs.size() = " + myfs.size());
+			//System.out.println( "myfs.size() = " + myfs.size());
 			ranges = new Range(0, (int)myfs.size() - 1).subranges(this.worldsize);
-			System.out.println( "HEY ASSHOLE\n\n\n\n\n array index (rank) = " + rank + 
-					"\n in an array of length " + ranges.length + 
-					"\n based on worldsize  " + this.worldsize );
+//			System.out.println( "HEY ASSHOLE\n\n\n\n\n array index (rank) = " + rank + 
+//					"\n in an array of length " + ranges.length + 
+//					"\n based on worldsize  " + this.worldsize );
 	        ir = ranges[rank];
 	        setStart(ir.lb());
 	        setEnd(ir.ub());
 			this.d = myfs.innerSize() - 1;
-			DPoint.setDimension(d);
+			DemoPoint.setDimension(d);
 			
 			myfs.seek(start);
-			this.points = myfs.getNext( this.size );
-			this.clusters = new double[k][];
+			this.points = DemoPointArray.toDemoPoints(myfs.getNext( this.size ));
+			this.clusters = new DemoPoint[k];
 			/*
 			for( int i = 0 ; i < this.size; ++i ) {
 				for( int  j = 0 ; j < d ; ++j ) {
@@ -122,11 +122,11 @@ public class ParallelKMeans extends KMeans {
 
     public void prepareClusters(boolean parallel) {
         for (int i = 0; i < points.length; i++) {
-            double[] dp = points[i];
+            DemoPoint dp = points[i];
             int c = (int) (k * rng.nextDouble());
             //System.out.println(dp + " assigned to clu " + c);
             if (dp != null) {
-                DPoint.setCluster(c, dp);
+                dp.setCluster(c);
             }
         }
         if (parallel) {
@@ -157,7 +157,7 @@ public class ParallelKMeans extends KMeans {
 
         // System.out.println("rank: " + this.rank);
         for (int i = 0; i < k; ++i) {
-            DPoint.setCoords(assignments[i], clusters[i]);
+            clusters[i].setCoords(assignments[i]);
         }
     }
 
@@ -184,25 +184,25 @@ public class ParallelKMeans extends KMeans {
 
         //System.out.println("updatestep - getStart " + getStart() + " getEnd " + getEnd());
         for (int i = getStart(); i < getEnd(); ++i) {
-            double[] p = points[i];
-            double[] coords = DPoint.getCoords(p);
-            int c = DPoint.getCluster(p);
+            DemoPoint p = points[i];
+            double[] coords = p.getCoords();
+            int c = p.getCluster();
             for (int j = 0; j < d; ++j) {
                 totals[c][j] += coords[j];
             }
             ++count[c];
         }
-        System.out.println ("Parallel K Means updateStep before PJ, rank = " + rank);
-        System.out.println( "rank " + rank +" k,d = " + k +","+d);
+        //System.out.println ("Parallel K Means updateStep before PJ, rank = " + rank);
+        //System.out.println( "rank " + rank +" k,d = " + k +","+d);
         for (int i = 0; i < k; ++i) {
         	
             try {
-            	if( rank == 2 ) System.out.println( "rank 2 start of iteration " +i );
+            	//if( rank == 2 ) System.out.println( "rank 2 start of iteration " +i );
                 world.reduce(0, IntegerBuf.buffer(count[i]), IntegerOp.SUM);
-                if( rank == 2 ) System.out.println( "done with 1st reduce");
+                //if( rank == 2 ) System.out.println( "done with 1st reduce");
                 for (int j = 0; j < d; ++j) {
                 	if( rank == 2 ) {
-                		System.out.println( "rank 2 reducing "+i + " " + j);
+                		//System.out.println( "rank 2 reducing "+i + " " + j);
                 	}
                     world.reduce(0, DoubleBuf.buffer(totals[i][j]), DoubleOp.SUM);
                 }
@@ -210,7 +210,7 @@ public class ParallelKMeans extends KMeans {
                 throw new RuntimeException(e);
             }
         }
-        System.out.println( "update step done with pj rank = " + rank);
+        //System.out.println( "update step done with pj rank = " + rank);
         if (rank == 0) {
             for (int i = 0; i < k; ++i) {
                 for (int j = 0; j < d; ++j) {
@@ -224,21 +224,21 @@ public class ParallelKMeans extends KMeans {
             // for each cluster, set his position to the average of his points
             for (int i = 0; i < k; ++i) {
                 if (clusters[i] == null) {
-                    clusters[i] = DPoint.dPoint(totals[i], i);
+                    clusters[i] = new DemoPoint(totals[i], i);
                     changedFlag = true;
                     continue;
                 }
-                double[] before = DPoint.getCoords(clusters[i]);
+                double[] before = clusters[i].getCoords();
                 for (int j = 0; j < d; ++j) {
                     if (before[j] != totals[i][j]) {
-                        DPoint.setCoords(totals[i], clusters[i]);
+                        clusters[i].setCoords(totals[i]);
                         changedFlag = true;
                         break;
                     }
                 }
             }
         }
-        System.out.println("about to broadcast clusters rank = " + rank);
+        //System.out.println("about to broadcast clusters rank = " + rank);
         try {
             broadcastClusters();
             //world.broadcast(0, BooleanBuf.buffer(changedFlag));
@@ -249,34 +249,34 @@ public class ParallelKMeans extends KMeans {
 
     public void startKMeans(String datafile, int maxiter) throws IOException {    	
         prepareData(datafile);
-        System.out.println("done preparing data");
+        //System.out.println("done preparing data");
         prepareClusters(false);
-        System.out.println("done with clusters");
+        //System.out.println("done with clusters");
         int count = 0;
         //printStatus(null);
         while (count < maxiter) {
             //*			
-        	System.out.println("welcum 2 while loop count = " + count);
+        	//System.out.println("welcum 2 while loop count = " + count);
             assignmentStep();
-            System.out.println("done with assignment step rank = " + rank);
+            //System.out.println("done with assignment step rank = " + rank);
             updateStep();
-            System.out.println("done with update step");
+            //System.out.println("done with update step");
 
             ImgGen generator = new ImgGen(10, 10, (rank == frontRank) ? true : false, k);
-            System.out.println( "Hi it's rank != fromrank" );
+            //System.out.println( "Hi it's rank != fromrank" );
+            generator.generatePoints(pointsData());
             if (rank != frontRank) {
-                generator.generatePoints(pointsData());
                 BufferedImage image = generator.getPointsImg();
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                System.out.println("preparing to imageio.write");
+                //System.out.println("preparing to imageio.write");
                 ImageIO.write(image, "png", bytes);
                 byte[] buffer = bytes.toByteArray();
                 int[] imageSize = {buffer.length};
-                System.out.println( "about to send integerbuf (imagesize)");
+                //System.out.println( "about to send integerbuf (imagesize)");
                 world.send(frontRank, count, IntegerBuf.buffer(imageSize));
-                System.out.println( "about to send bytebuf (image)");
+                //System.out.println( "about to send bytebuf (image)");
                 world.send(frontRank, count, ByteBuf.buffer(buffer));
-                System.out.println("done sending bytebuf");
+                //System.out.println("done sending bytebuf");
             } else {
                 byte[] tracker = new byte[worldsize];
                 int[] sizes = new int[worldsize];
@@ -284,16 +284,16 @@ public class ParallelKMeans extends KMeans {
                     if (rank != i) {
                         int[] imageSize = new int[1];
                         IntegerBuf imgSizeBuf = IntegerBuf.buffer(imageSize);
-                        System.out.println("about to receive image size buf from rank " + i);
+                        //System.out.println("about to receive image size buf from rank " + i);
                         CommStatus status = world.receive(i, count, imgSizeBuf);
                         if (tracker[status.fromRank] == 0) {
-                        	System.out.println("passed if fromrank == 0");
+                        	//System.out.println("passed if fromrank == 0");
                             byte[] buffer = new byte[imageSize[0]];
                             ByteBuf buf = ByteBuf.buffer(buffer);
-                            System.out.println("about to receive bytebuf from rank 0");
+                            //System.out.println("about to receive bytebuf from rank 0");
                             world.receive(i, count, buf);
                             BufferedImage imagePart = ImageIO.read(new ByteArrayInputStream(buffer));
-                            System.out.println("done with imageio.read");
+                            //System.out.println("done with imageio.read");
                             if (imagePart != null) {
                                 generator.addPointsImage(imagePart);
                             }
@@ -305,7 +305,7 @@ public class ParallelKMeans extends KMeans {
                 addArchivedImage(image);
             }
 
-            System.out.println("Iteration " + count);
+            //System.out.println("Iteration " + count);
             //printStatus(null);
 
             ++count;
