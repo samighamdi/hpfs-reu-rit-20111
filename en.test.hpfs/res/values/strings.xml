@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title">K-Maps Cluster</string>
+    <string name="app_name">HPFS Client Test</string>
+    <string name="Close">Close</string>
+    <string name="title1">Settings</string>
+    <string name="numPoints">How many points are to be used for this K-means calculation?</string>
+    <string name="numClusters">How many data clusters?</string>
+    <string name="numDimensions">What is the max dimension?</string>
+    <string name="seed">What is the seed for the random number generator?</string>
+</resources>
