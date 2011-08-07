@@ -1,4 +1,4 @@
-package kmeansdemondp;
+package arrayfs;
 
 /**
  * Abstract class for a two-dimension array to be stored and managed in a file

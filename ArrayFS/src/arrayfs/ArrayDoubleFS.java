@@ -1,4 +1,4 @@
-package kmeansdemondp;
+package arrayfs;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -356,7 +356,7 @@ public class ArrayDoubleFS extends ArrayFS {
             byte[] temp = new byte[type * (int)innerSize * (int)Math.min(BUFFERSIZE, array.length - a)];
             fs.readFully(temp);
             ByteBuffer bytes = ByteBuffer.wrap(temp);
-            for (int i = a; i < (int)Math.min(BUFFERSIZE, array.length - a); i++) {
+            for (int i = a; i < a + (int)Math.min(BUFFERSIZE, array.length - a); i++) {
                 for (int j = 0; j < array[i].length; j++) {
                     array[i][j] = bytes.getDouble();
                 }
@@ -402,7 +402,7 @@ public class ArrayDoubleFS extends ArrayFS {
                 byte[] temp = new byte[type * (int)innerSize * (int)Math.min(BUFFERSIZE, num - a)];
                 fs.readFully(temp);
                 ByteBuffer bytes = ByteBuffer.wrap(temp);
-                for (int i = a; i < (int)Math.min(BUFFERSIZE, num - a); i++) {
+                for (int i = a; i < a + (int)Math.min(BUFFERSIZE, num - a); i++) {
                     for (int j = 0; j < array[i].length; j++) {
                         array[i][j] = bytes.getDouble();
                     }
@@ -442,6 +442,6 @@ public class ArrayDoubleFS extends ArrayFS {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, FileNotFoundException, IOException {
     }
 }
