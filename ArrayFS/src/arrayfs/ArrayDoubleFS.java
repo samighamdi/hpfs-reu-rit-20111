@@ -407,7 +407,7 @@ public class ArrayDoubleFS extends ArrayFS {
                         array[i][j] = bytes.getDouble();
                     }
                 }
-                position++;
+                position += (int)Math.min(BUFFERSIZE, num - a);
             }
             return array;
         }
