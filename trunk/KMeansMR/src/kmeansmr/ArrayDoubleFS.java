@@ -13,6 +13,12 @@ import java.nio.ByteBuffer;
 import java.text.ParseException;
 import java.util.UUID;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+
 /**
  * Stores and manages a two-dimensional double array in a file.
  * 
@@ -27,6 +33,23 @@ public class ArrayDoubleFS extends ArrayFS {
     private long position;
     private String filename;
     private RandomAccessFile fs;
+    private FSDataInputStream hadoopIn;
+    
+    
+    
+    /**
+     * Constructor used to access file on hadoop dfs
+     * @param path path to the file
+     */
+    public ArrayDoubleFS(Path path, Configuration conf) throws IOException
+    {
+    	FileSystem fs = path.getFileSystem(conf);
+    	hadoopIn = fs.open(path);
+    	type = hadoopIn.readByte();
+        size = hadoopIn.readLong();
+        innerSize = hadoopIn.readInt();
+        hadoopIn.seek(HEADERSIZE);
+    }
     
     /**
      * Creates a two-dimensional double array of length 0 stored in a randomly named file with the specified inner array size
@@ -344,19 +367,25 @@ public class ArrayDoubleFS extends ArrayFS {
         return innerSize;
     }
     
-    /*
+    /**
      * Returns a copy of two-dimensional array stored by this file
+     * Must use Hadoop constructor to use this function
      * 
      * @return      A copy of the two-dimension array stored by this file
      */
     public double[][] getArray() throws IOException {
+    	
+    	if(hadoopIn == null)
+    		throw new FileNotFoundException("File on DFS not found");
+    
+    	
         double[][] array = new double[(int)size][(int)innerSize];
-        fs.seek(HEADERSIZE);
+        hadoopIn.seek(HEADERSIZE);
         for (int a = 0; a < array.length; a += (int)Math.min(BUFFERSIZE, array.length - a)) {
             byte[] temp = new byte[type * (int)innerSize * (int)Math.min(BUFFERSIZE, array.length - a)];
-            fs.readFully(temp);
+            hadoopIn.readFully(temp);
             ByteBuffer bytes = ByteBuffer.wrap(temp);
-            for (int i = a; i < (int)Math.min(BUFFERSIZE, array.length - a); i++) {
+            for (int i = a; i < a + (int)Math.min(BUFFERSIZE, array.length - a); i++) {
                 for (int j = 0; j < array[i].length; j++) {
                     array[i][j] = bytes.getDouble();
                 }
@@ -402,7 +431,7 @@ public class ArrayDoubleFS extends ArrayFS {
                 byte[] temp = new byte[type * (int)innerSize * (int)Math.min(BUFFERSIZE, num - a)];
                 fs.readFully(temp);
                 ByteBuffer bytes = ByteBuffer.wrap(temp);
-                for (int i = a; i < (int)Math.min(BUFFERSIZE, num - a); i++) {
+                for (int i = a; i < a + (int)Math.min(BUFFERSIZE, num - a); i++) {
                     for (int j = 0; j < array[i].length; j++) {
                         array[i][j] = bytes.getDouble();
                     }
@@ -438,10 +467,21 @@ public class ArrayDoubleFS extends ArrayFS {
     public void close() throws IOException {
         fs.close();
     }
+    
+    /**
+     * Closes Hadoop file stream
+     * @throws IOException
+     */
+    public void closeHadoop() throws IOException
+    {
+    	hadoopIn.close();
+    	
+    }
+    
 
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, FileNotFoundException, IOException {
     }
 }
