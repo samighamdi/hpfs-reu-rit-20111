@@ -5,39 +5,111 @@ import java.util.ArrayList;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
 
 
 
-public class KMeansReduce extends Reducer<IntWritable, ArrayList<DoubleWritable>, Object, Object>
+public class KMeansReduce extends Reducer<IntWritable, DoubleArrayWritable, IntWritable, DoubleArrayWritable>
 {
+	MultipleOutputs mos;
 	@Override
-	protected void reduce(IntWritable key, Iterable<ArrayList<DoubleWritable>> values, Context context) throws
+	public void setup(Context context) throws IOException, InterruptedException
+	{
+		super.setup(context);
+		mos = new MultipleOutputs(context);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void reduce(IntWritable key, Iterable<DoubleArrayWritable> values, Context context) throws
 	IOException, InterruptedException
 	{
-		ArrayList<DoubleWritable> point = values.iterator().next(); //first point is used to get the dimensionality
-		double totals[] = new double[point.size()];
+	
+		
+	
+		DoubleWritable point[] = values.iterator().next().get(); //first point is used to get the dimensionality
+		double totals[] = new double[point.length];
+		ArrayList<DoubleWritable[]> points = new ArrayList<DoubleWritable[]>();
 		int numPoints = 1;
+		
+		
 		
 		//initialize totals array to first point coordinates 
 		for(int i = 0; i < totals.length; i++)
-			totals[i] = point.get(i).get();
+		{
+			totals[i] = point[i].get();
+			
+		}
 		
+		points.add(point); //add the initial point to the the collection of points
+		
+		
+		
+		//loop through all the points in the cluster
 		while(values.iterator().hasNext())
 		{
-			point = values.iterator().next();
+			point = (DoubleWritable[]) values.iterator().next().get();
+			
 			
 			for(int i = 0; i < totals.length; i++)
-				totals[i] += point.get(i).get();
+			{
+				totals[i] += point[i].get();
+				
+			}
 			
+		
+			points.add(point); //add the point to the points arraylist
 			numPoints++;
 		}
 		
-		String clusterCoords[] = new String[totals.length];
 		
+		DoubleArrayWritable ccWrapper = new DoubleArrayWritable();
+		DoubleWritable clusterCoords[] = new DoubleWritable[totals.length];
+		
+		//calculate the new cluster centers
 		for(int i = 0; i < totals.length; i++)
-			clusterCoords[i] = Double.toString(totals[i] / numPoints);
+		{
+			clusterCoords[i] = new DoubleWritable(totals[i] / numPoints);
+			
+		}
 		
-		context.getConfiguration().setStrings("Cluster" + key.get(), clusterCoords);
+		
+		
+		
+		ccWrapper.set(clusterCoords);
+		
+		DoubleWritable dwPoints[][] = new DoubleWritable[points.size()][totals.length];
+		
+		int i = 0;
+		for(DoubleWritable pt[] : points)
+		{
+			for(int j = 0; j < pt.length; j++)
+			{
+				dwPoints[i][j] = pt[j];
+			}
+			i++;
+		}
+		
+		
+		
+		
+		mos.write("text", key, ccWrapper);
+		mos.write("pic", key, new Double2DArrayWritable(dwPoints));
+		
+		
+		
+		
+	//context.write(key, ccWrapper);
+		
+		
+		
+	}
+	
+	@Override
+	public void cleanup(Context context) throws IOException, InterruptedException
+	{
+		mos.close();
+		super.cleanup(context);
 	}
 	
 }
