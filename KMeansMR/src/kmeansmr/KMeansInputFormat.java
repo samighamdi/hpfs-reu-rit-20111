@@ -10,10 +10,10 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 
 
 
-public class KMeansInputFormat extends FileInputFormat<IntWritable, DoubleArrayWritable>{
+public class KMeansInputFormat extends FileInputFormat<IntWritable, Double2DArrayWritable>{
 
 	@Override
-	public RecordReader<IntWritable, DoubleArrayWritable> createRecordReader(
+	public RecordReader<IntWritable, Double2DArrayWritable> createRecordReader(
 			InputSplit split, TaskAttemptContext arg1) throws IOException,
 			InterruptedException {
 		

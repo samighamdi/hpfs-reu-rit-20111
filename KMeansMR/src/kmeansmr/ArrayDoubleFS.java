@@ -401,14 +401,14 @@ public class ArrayDoubleFS extends ArrayFS {
      * 
      * @return      A single segment of the two-dimensional array stored by this file at the current index pointer position
      */
-    public double[][] getNext() throws IOException, ArrayIndexOutOfBoundsException {
+    public double[] getNext() throws IOException, ArrayIndexOutOfBoundsException {
         if (position < size) {
-            double [][] array = new double[1][(int)innerSize];
+            double [] array = new double[(int)innerSize];
             byte[] temp = new byte[type * (int)innerSize];
-            fs.readFully(temp);
+            hadoopIn.readFully(temp);
             ByteBuffer bytes = ByteBuffer.wrap(temp);
-            for (int j = 0; j < array[0].length; j++) {
-                array[0][j] = bytes.getDouble();
+            for (int j = 0; j < array.length; j++) {
+                array[j] = bytes.getDouble();
             }
             position++;
             return array;
@@ -429,14 +429,14 @@ public class ArrayDoubleFS extends ArrayFS {
             double [][] array = new double[(int)num][(int)innerSize];
             for (int a = 0; a < num; a += (int)Math.min(BUFFERSIZE, num - a)) {
                 byte[] temp = new byte[type * (int)innerSize * (int)Math.min(BUFFERSIZE, num - a)];
-                fs.readFully(temp);
+                hadoopIn.readFully(temp);
                 ByteBuffer bytes = ByteBuffer.wrap(temp);
                 for (int i = a; i < a + (int)Math.min(BUFFERSIZE, num - a); i++) {
                     for (int j = 0; j < array[i].length; j++) {
                         array[i][j] = bytes.getDouble();
                     }
                 }
-                position++;
+                position += Math.min(BUFFERSIZE, num - a);
             }
             return array;
         }

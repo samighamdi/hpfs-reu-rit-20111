@@ -3,7 +3,6 @@ package kmeansmr;
 
 import java.io.IOException;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 
 
@@ -13,17 +12,21 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 
 
-public class KMeansMap extends Mapper<IntWritable, DoubleArrayWritable, 
+public class KMeansMap extends Mapper<IntWritable, Double2DArrayWritable, 
 IntWritable, DoubleArrayWritable>
 
 {
 
 	@Override
-	public void map(IntWritable key, DoubleArrayWritable value, Context context) throws IOException,
+	public void map(IntWritable key, Double2DArrayWritable value, Context context) throws IOException,
 	InterruptedException
 	{
 		Configuration conf = context.getConfiguration();
-		double point[] = new double[value.get().length];
+
+
+		double points[][] = value.getAsDoubles();
+		double point[] = null; //will hold one point
+
 		int k = conf.getInt("k", -1);
 		double minTotal = Double.POSITIVE_INFINITY, tempTotal;
 
@@ -33,7 +36,7 @@ IntWritable, DoubleArrayWritable>
 
 
 
-		double clusters[][] = new double[k][value.get().length];
+		double clusters[][] = new double[k][points[0].length];
 		String clustCoords[];
 		int closestCluster = -1;
 
@@ -48,27 +51,28 @@ IntWritable, DoubleArrayWritable>
 
 		}
 
-		DoubleWritable p[] = (DoubleWritable[]) value.get();
+		
 
-		//turn the point into a double array
-		for(int i = 0; i < value.get().length; i++)
-			point[i] = p[i].get();
-
-		context.getConfiguration().setFloat("yes", (float) point[0]);
-
-		for(int i = 0; i < clusters.length; i++)
+		for(int i = 0; i < points.length; i++)
 		{
-			tempTotal = KMeansJobGenerator.fitness(point, clusters[i]);
-			if(minTotal > tempTotal)
+			point = points[i];
+			minTotal = Double.POSITIVE_INFINITY;
+			for(int j = 0; j < clusters.length; j++)
 			{
-				minTotal = tempTotal;
-				closestCluster = i;
 
+				tempTotal = KMeansJobGenerator.fitness(point, clusters[j]);
+				if(minTotal > tempTotal)
+				{
+					minTotal = tempTotal;
+					closestCluster = j;
+
+				}
 			}
+			context.write(new IntWritable(closestCluster), new DoubleArrayWritable(point));
 		}
 
 
-		context.write(new IntWritable(closestCluster), value);
+		
 
 
 

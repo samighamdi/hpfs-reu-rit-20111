@@ -25,12 +25,12 @@ public class KMeansReduce extends Reducer<IntWritable, DoubleArrayWritable, IntW
 	IOException, InterruptedException
 	{
 	
-		
+		final int BUFFERSIZE = KMeansConstants.BUFFERSIZE;  
 	
 		DoubleWritable point[] = values.iterator().next().get(); //first point is used to get the dimensionality
 		double totals[] = new double[point.length];
 		ArrayList<DoubleWritable[]> points = new ArrayList<DoubleWritable[]>();
-		int numPoints = 1;
+		int numPoints = 1, tmpCounter = 1;
 		
 		
 		
@@ -57,9 +57,16 @@ public class KMeansReduce extends Reducer<IntWritable, DoubleArrayWritable, IntW
 				
 			}
 			
-		
+			
 			points.add(point); //add the point to the points arraylist
-			numPoints++;
+			numPoints++; tmpCounter++;
+			
+			if(tmpCounter >= BUFFERSIZE)
+			{
+				mos.write("pic", key, new Double2DArrayWritable(points));
+				points.clear();
+				tmpCounter = 0;
+			}
 		}
 		
 		
@@ -78,23 +85,15 @@ public class KMeansReduce extends Reducer<IntWritable, DoubleArrayWritable, IntW
 		
 		ccWrapper.set(clusterCoords);
 		
-		DoubleWritable dwPoints[][] = new DoubleWritable[points.size()][totals.length];
 		
-		int i = 0;
-		for(DoubleWritable pt[] : points)
-		{
-			for(int j = 0; j < pt.length; j++)
-			{
-				dwPoints[i][j] = pt[j];
-			}
-			i++;
-		}
 		
 		
 		
 		
 		mos.write("text", key, ccWrapper);
-		mos.write("pic", key, new Double2DArrayWritable(dwPoints));
+		
+		if(points.size() != 0)
+			mos.write("pic", key, new Double2DArrayWritable(points));
 		
 		
 		
