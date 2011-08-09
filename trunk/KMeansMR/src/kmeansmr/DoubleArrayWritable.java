@@ -21,11 +21,23 @@ public class DoubleArrayWritable implements Writable{
 	{
 		set(a);
 	}
+	
+	public DoubleArrayWritable(double a[])
+	{
+		set(a);
+	}
 	public void set(DoubleWritable array[])
 	{
 		this.darray = array;
 	}
 
+	public void set(double a[])
+	{
+		darray = new DoubleWritable[a.length];
+		for(int i = 0; i < a.length; i++)
+			darray[i] = new DoubleWritable(a[i]);
+	}
+	
 	@Override
 	public void readFields(DataInput in) throws IOException
 	{

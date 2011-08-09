@@ -75,15 +75,16 @@ public class KMeansJobGenerator {
 			}
 			if(convergence)
 			{
-				for(int i = 0; i < initCC.length; i++)
-				{
-					System.out.print("Cluster " + i + ": ");
-					for(int j = 0; j < initCC[i].length; j++)
-					{
-						System.out.print(initCC[i][j] + ", ");
-					}
-				}
-				System.out.print("\n");
+//				
+//				for(int i = 0; i < initCC.length; i++)
+//				{
+//					System.out.print("Cluster " + i + ": ");
+//					for(int j = 0; j < initCC[i].length; j++)
+//					{
+//						System.out.print(initCC[i][j] + ", ");
+//					}
+//				}
+//				System.out.print("\n");
 				return null;
 			}
 		}
@@ -95,21 +96,21 @@ public class KMeansJobGenerator {
 
 
 
-		System.out.println("Before iteration:");
-
-		for(int i = 0; i < k; i++)
-		{
-			System.out.print("Cluster " + i + ": ");
-
-			for(String str : conf.getStrings("Cluster" + i))
-			{
-				System.out.print(str + ", ");
-			}
-
-			System.out.print("\n");
-		}
-
-		System.out.print("\n");
+//		System.out.println("Before iteration:");
+//
+//		for(int i = 0; i < k; i++)
+//		{
+//			System.out.print("Cluster " + i + ": ");
+//
+//			for(String str : conf.getStrings("Cluster" + i))
+//			{
+//				System.out.print(str + ", ");
+//			}
+//
+//			System.out.print("\n");
+//		}
+//
+//		System.out.print("\n");
 		Job job = null;
 		try {
 			job = new Job(conf);
@@ -123,7 +124,6 @@ public class KMeansJobGenerator {
 		job.setReducerClass(KMeansReduce.class);
 		job.setMapOutputKeyClass(IntWritable.class);
 		job.setMapOutputValueClass(DoubleArrayWritable.class);
-
 		job.setJarByClass(KMeansJobGenerator.class);
 
 

@@ -1,11 +1,7 @@
 package kmeansmr;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.ParseException;
-
-import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.InputSplit;
@@ -15,16 +11,19 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 
 
-public class KMeansRecordReader extends RecordReader<IntWritable, DoubleArrayWritable> {
+public class KMeansRecordReader extends RecordReader<IntWritable, Double2DArrayWritable> {
 
+	final int BUFFERSIZE = KMeansConstants.BUFFERSIZE;
 	private double points[][];
-
-	private DoubleArrayWritable value;
+	private ArrayDoubleFS fr = null;
+	private Double2DArrayWritable value;
 	private IntWritable key;
+	private int arraySize;
+	private int currentIndex;
 
 	@Override
 	public void close() throws IOException {
-
+		fr.closeHadoop();
 
 	}
 
@@ -32,7 +31,7 @@ public class KMeansRecordReader extends RecordReader<IntWritable, DoubleArrayWri
 	@Override
 	public float getProgress() throws IOException {
 
-		return (float)key.get() / (points.length - 1);
+		return (float)(key.get()/ fr.size());
 	}
 
 
@@ -45,7 +44,7 @@ public class KMeansRecordReader extends RecordReader<IntWritable, DoubleArrayWri
 	}
 
 	@Override
-	public DoubleArrayWritable getCurrentValue() throws IOException,
+	public Double2DArrayWritable getCurrentValue() throws IOException,
 	InterruptedException {
 
 		return value;
@@ -56,44 +55,63 @@ public class KMeansRecordReader extends RecordReader<IntWritable, DoubleArrayWri
 			throws IOException, InterruptedException {
 
 		key = new IntWritable(-1);
-		value = new DoubleArrayWritable();
+		currentIndex = BUFFERSIZE;
 
 		FileSplit split = (FileSplit) inSplit;
 		
 
 		
-		ArrayDoubleFS fr = null;
+		
 		try {
 			fr = new ArrayDoubleFS(split.getPath(), context.getConfiguration());
-			points = fr.getArray();
-			fr.closeHadoop();
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
 		
-		for(int i = 0; i < points.length; i++)
-		{
-			points[i] = getCoords(points[i]);
-		}
 
 	}
 
 	@Override
 	public boolean nextKeyValue() throws IOException, InterruptedException {
 
-		key.set(key.get() + 1);
 		
-		if(key.get() >= points.length)
+		
+		arraySize = Math.min(BUFFERSIZE, (int)fr.size() - key.get());
+		key.set(arraySize + key.get()); 
+		currentIndex += arraySize;
+		
+		if(currentIndex >= arraySize && !fr.hasNext())
+		{
 			return false;
+		}
+		
+		if(currentIndex >= arraySize)
+		{
+			
+			points = fr.getNext(arraySize);	
+			currentIndex = 0;
+			
+			for(int i = 0; i < points.length; i++)
+				points[i] = getCoords(points[i]);
+		}
+		
+		DoubleWritable dw[][] = new DoubleWritable[points.length][points[0].length];
+		
+		for(int i = 0; i < points.length; i++)
+			for(int j = 0; j < points[i].length; j++)
+				dw[i][j] = new DoubleWritable(points[i][j]);
 
-		DoubleWritable p[] = new DoubleWritable[points[key.get()].length];
+		value = new Double2DArrayWritable(dw);
 
-		for(int j = 0; j < points[key.get()].length; j++)
-			p[j] = new DoubleWritable(points[key.get()][j]);
+		/*
+		for(int j = 0; j < points[currentIndex].length; j++)
+			p[j] = new DoubleWritable(points[currentIndex][j]);
 		
 		value.set(p);
+		*/
 
 		return true;
 	}

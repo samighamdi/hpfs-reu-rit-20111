@@ -3,6 +3,7 @@ package kmeansmr;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Writable;
@@ -13,9 +14,10 @@ public class Double2DArrayWritable  implements Writable{
 	private DoubleWritable darray[][];
 	
 	
-	public Double2DArrayWritable()
+	
+	public Double2DArrayWritable(ArrayList<DoubleWritable[]> al)
 	{
-		
+		set(al);
 	}
 	
 	public Double2DArrayWritable(DoubleWritable[][] a)
@@ -26,6 +28,16 @@ public class Double2DArrayWritable  implements Writable{
 	{
 		this.darray = twoDArray;
 	}
+	
+	public void set(ArrayList<DoubleWritable[]> al)
+	{
+		darray = new DoubleWritable[al.size()][];
+		
+		int i = 0;
+		for(DoubleWritable point[] : al)
+			darray[i++] = point;
+	}
+	
 	
 	@Override
 	public void readFields(DataInput in) throws IOException
